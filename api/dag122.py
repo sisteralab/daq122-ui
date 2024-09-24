@@ -52,6 +52,7 @@ class DAQ122:
         self.dll = ctypes.CDLL(dll_path)
         self._setup_function_prototypes()
         self.obj = None
+        self.sample_rate = None
 
     def _setup_function_prototypes(self):
         # Set up function prototypes according to the actual DLL functions
@@ -137,9 +138,9 @@ class DAQ122:
         if not self.dll.DAQ122_StopCollection(self.obj):
             raise RuntimeError("Failed to stop data collection.")
 
-    def read_data(self, read_elements_count: int = 100, channel_number: int = 0):
-        if read_elements_count > 1000:
-            raise ValueError("read_elements_count must not exceed 1000.")
+    def read_data(self, read_elements_count: int = 100, channel_number: int = 0, timeout: int = 1000):
+        if read_elements_count > self.sample_rate.value:
+            raise ValueError("read_elements_count must not be greater than sample_rate")
         data_buffer = (ctypes.c_double * self.sample_rate.value)()
-        label = self.dll.DAQ122_TryReadData(self.obj, channel_number, data_buffer, read_elements_count, 250)
+        label = self.dll.DAQ122_TryReadData(self.obj, channel_number, data_buffer, read_elements_count, timeout)
         return label, data_buffer
