@@ -14,7 +14,7 @@ if __name__ == "__main__":
             if mess.is_connected():
                 print("Device is connected")
 
-            if mess.configure_sampling_parameters(DAQVoltage.Voltage5V, DAQSampleRate.SampleRate100K):
+            if mess.configure_sampling_parameters(DAQVoltage.Voltage5V, DAQSampleRate.SampleRate500):
                 print("Sampling parameters configured")
 
             if mess.config_adc_channel(DAQADCChannel.AIN_ALL):
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
                 while True:
 
-                    success, data = mess.read_data(read_elements_count=100000, channel_number=0, timeout=5000)
+                    success, data = mess.read_data(read_elements_count=500, channel_number=0, timeout=5000)
                     if success:
                         read_data = np.array(data)
                         pressure = read_data[0]
@@ -47,5 +47,5 @@ if __name__ == "__main__":
         print(f"Exception: {e}")
         plt.ioff()
 
-    with open("meas_stab_10k.json", 'w') as f:
-        json.dump(full_data, f, indent=4)
+    with open("meas_stab_500_noize.json", 'w') as f:
+        json.dump(full_data, f)
