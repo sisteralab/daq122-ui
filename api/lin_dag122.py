@@ -31,8 +31,13 @@ class DAQ122:
         self.dll.DAQ122_New.restype = ctypes.POINTER(ctypes.c_uint32)
         self.dll.DAQ122_Delete.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
 
+        self.dll._ZN6libdaq6device6DAQ122C1Ev.restype = ctypes.POINTER(ctypes.c_uint32)
+        self.dll._ZN6libdaq6device6DAQ122D0Ev.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
+
         self.dll.DAQ122_InitializeDevice.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
         self.dll.DAQ122_InitializeDevice.restype = ctypes.c_bool
+        self.dll._ZN6libdaq6device6DAQ12216InitializeDeviceEv.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
+        self.dll._ZN6libdaq6device6DAQ12216InitializeDeviceEv.restype = ctypes.c_bool
 
         self.dll.DAQ122_ConnectedDevice.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
         self.dll.DAQ122_ConnectedDevice.restype = ctypes.c_bool

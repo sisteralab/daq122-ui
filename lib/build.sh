@@ -1,0 +1,1 @@
+g++ -shared -o libdaq-2.0.0.so -fPIC libdaq.cpp
