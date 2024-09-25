@@ -19,6 +19,12 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Укажите путь к CMake-файлам pybind11
+set(CMAKE_PREFIX_PATH ${PYBIND11_CMAKE_DIR})
+
+# Найти pybind11
+find_package(pybind11 REQUIRED)
+
 # Добавление директорий с заголовочными файлами
 include_directories(libdaq ${Python3_INCLUDE_DIRS} ${PYBIND11_INCLUDE_DIR})
 
@@ -31,6 +37,3 @@ target_link_libraries(daq122 PRIVATE ${Python3_LIBRARIES} pybind11::module)
 
 # Установка свойств для создания динамической библиотеки
 set_target_properties(daq122 PROPERTIES PREFIX "" SUFFIX ".so")
-
-# Укажите путь к CMake-файлам pybind11
-set(CMAKE_PREFIX_PATH ${PYBIND11_CMAKE_DIR})
