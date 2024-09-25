@@ -20,7 +20,7 @@ class DAQ122:
             dll_path (str): The path to the DLL file for the DAQ device.
         """
         if dll_path is None:
-            dll_path = os.path.join(os.path.split(os.path.realpath(__file__))[0], r"libdaq-2.0.0.dll")
+            dll_path = os.path.join(os.path.split(os.path.realpath(__file__))[0], r"lib-2.0.0.dll")
         self.dll = ctypes.CDLL(dll_path)
         self._setup_function_prototypes()
         self.obj = None

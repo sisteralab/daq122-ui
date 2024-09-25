@@ -1,4 +1,4 @@
-#if USE_DAQ122
+﻿#if USE_DAQ122
 #pragma once
 
 #include "libdaq/device/base_device.h"

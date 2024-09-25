@@ -1,1 +1,1 @@
-g++ -shared -o libdaq-2.0.0.so -fPIC libdaq.cpp
+g++ -shared -o daq122.so -fPIC daq122.cpp

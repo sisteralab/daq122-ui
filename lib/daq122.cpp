@@ -1,4 +1,4 @@
-#include "libdaq.h"
+#include "libdaq/device/DAQ122/daq122.h"
 
 extern "C" {
     libdaq::device::DAQ122* DAQ122_new() {
