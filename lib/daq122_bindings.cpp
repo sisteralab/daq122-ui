@@ -13,5 +13,5 @@ PYBIND11_MODULE(daq122, m) {
         .def("ConfigureADCParameters", &libdaq::device::DAQ122::ConfigureADCParameters)
         .def("ConfigADCChannel", &libdaq::device::DAQ122::ConfigADCChannel)
         .def("StartADCCollection", &libdaq::device::DAQ122::StartADCCollection)
-        .def("StopADCCollection", &libdaq::device::DAQ122::StopADCCollection)
+        .def("StopADCCollection", &libdaq::device::DAQ122::StopADCCollection);
 }
