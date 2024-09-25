@@ -3,3 +3,4 @@
 *.DS_Store
 *venv
 lib/build
+!lib/build/*.so
