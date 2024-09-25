@@ -1,7 +1,7 @@
 ﻿#ifndef DAQ122_H
 #define DAQ122_H
 
-#include "libdaq/device/base_device.h"
+#include "device/base_device.h"
 
 namespace libdaq {
 namespace device {
