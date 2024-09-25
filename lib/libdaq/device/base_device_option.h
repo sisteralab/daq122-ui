@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "libdaq/device/base_device_config.h"
+#include "device/base_device_config.h"
 
 namespace libdaq {
 namespace device {

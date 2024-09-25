@@ -5,7 +5,7 @@
 #include <future>
 #include <thread>
 
-#include "libdaq/device/base_device.h"
+#include "device/base_device.h"
 
 namespace libdaq {
 namespace device {

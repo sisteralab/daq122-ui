@@ -10,10 +10,10 @@
 
 // clang-format off
 #include "readerwriterqueue.h"
-#include "libdaq/backend/base_backend.h"
-#include "libdaq/backend/base_backend_option.h"
-#include "libdaq/device/base_device_config.h"
-#include "libdaq/device/base_device_option.h"
+#include "backend/base_backend.h"
+#include "backend/base_backend_option.h"
+#include "device/base_device_config.h"
+#include "device/base_device_option.h"
 // clang-format on
 
 namespace libdaq {

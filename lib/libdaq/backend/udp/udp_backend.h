@@ -5,8 +5,8 @@ extern "C" {
 #include "event2/event.h"
 #include "event2/bufferevent.h"
 }
-#include "libdaq/backend/base_backend.h"
-#include "libdaq/backend/base_backend_option.h"
+#include "backend/base_backend.h"
+#include "backend/base_backend_option.h"
 
 namespace libdaq {
 namespace backend {

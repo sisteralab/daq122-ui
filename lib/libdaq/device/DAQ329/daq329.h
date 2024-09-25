@@ -1,7 +1,7 @@
 ﻿#if USE_DAQ329
 #pragma once
 
-#include "libdaq/device/base_device.h"
+#include "device/base_device.h"
 
 namespace libdaq {
 namespace device {

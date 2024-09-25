@@ -3,8 +3,8 @@
 // clang-format off
 #include <serial/serial.h>
 #include <iostream>
-#include "libdaq/backend/base_backend.h"
-#include "libdaq/backend/base_backend_option.h"
+#include "backend/base_backend.h"
+#include "backend/base_backend_option.h"
 // clang-format on
 
 namespace libdaq {

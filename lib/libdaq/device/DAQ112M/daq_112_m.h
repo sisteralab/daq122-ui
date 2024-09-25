@@ -1,8 +1,8 @@
 #if USE_DAQ112M
 #pragma once
 
-#include "libdaq/device/base_device.h"
-#include "libdaq/device/DAQ112M/daq_112_config.h"
+#include "device/base_device.h"
+#include "device/DAQ112M/daq_112_config.h"
 
 namespace libdaq {
 namespace device {

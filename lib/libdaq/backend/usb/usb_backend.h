@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "libdaq/backend/base_backend.h"
-#include "libdaq/backend/base_backend_option.h"
+#include "backend/base_backend.h"
+#include "backend/base_backend_option.h"
 
 extern "C" {
 #include "libusb-1.0/libusb.h"

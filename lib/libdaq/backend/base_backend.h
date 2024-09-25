@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "libdaq/backend/base_backend_option.h"
-#include "libdaq/log/log_config.h"
+#include "backend/base_backend_option.h"
+#include "log/log_config.h"
 
 #define BASE_BACKEND_PRINT_UNSUPPORT DAQ_LIB_LOGGER_WARN("BaseBackend don't support this API.")
 
