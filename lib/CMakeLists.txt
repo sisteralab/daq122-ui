@@ -27,6 +27,7 @@ find_package(pybind11 REQUIRED)
 
 # Добавление директорий с заголовочными файлами
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libdaq ${Python3_INCLUDE_DIRS} ${PYBIND11_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(.)
 
 # Добавление исходных файлов
 add_library(daq122 MODULE daq122_bindings.cpp)
