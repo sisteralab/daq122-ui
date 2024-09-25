@@ -14,13 +14,4 @@ PYBIND11_MODULE(daq122, m) {
         .def("ConfigADCChannel", &libdaq::device::DAQ122::ConfigADCChannel)
         .def("StartADCCollection", &libdaq::device::DAQ122::StartADCCollection)
         .def("StopADCCollection", &libdaq::device::DAQ122::StopADCCollection)
-        .def("ReceiveData", &libdaq::device::DAQ122::ReceiveData)
-        .def("ParseData", &libdaq::device::DAQ122::ParseData)
-        .def("SendConnected", &libdaq::device::DAQ122::SendConnected)
-        .def("SendStartCollection", &libdaq::device::DAQ122::SendStartCollection)
-        .def("SendStopCollection", &libdaq::device::DAQ122::SendStopCollection)
-        .def("InitADCChannel", &libdaq::device::DAQ122::InitADCChannel)
-        .def("BuildSendPacket", &libdaq::device::DAQ122::BuildSendPacket)
-        .def("SendCommand", &libdaq::device::DAQ122::SendCommand)
-        .def("SendConfigureCommand", &libdaq::device::DAQ122::SendConfigureCommand);
 }
