@@ -1,1 +1,0 @@
-g++ -shared -o daq122.so -fPIC daq122.cpp
