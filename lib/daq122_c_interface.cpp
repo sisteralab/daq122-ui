@@ -43,7 +43,7 @@ bool DAQ122_StopCollection(DAQ122Handle handle) {
 }
 
 bool DAQ122_TryReadData(DAQ122Handle handle, uint8_t channel, double *read_buffer, uint32_t read_size, uint32_t timeout) {
-    return static_cast<libdaq::device::DAQ122*>(handle)->TryReadData(
+    return static_cast<libdaq::device::DAQ122*>(handle)->TryReadADCData(
         channel,
         read_buffer,
         read_size,
