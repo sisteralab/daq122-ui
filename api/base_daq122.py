@@ -1,4 +1,5 @@
 import ctypes
+import os
 
 from api.structures import DAQVoltage, DAQSampleRate, DAQADCChannel
 
@@ -18,14 +19,17 @@ class DAQ122:
         Parameters:
             dll_path (str): The path to the DLL file for the DAQ device.
         """
-        assert dll_path is not None, "You have to provide DLL or SO"
+        if dll_path is None:
+            dll_path = self._define_dll()
         self.dll = ctypes.CDLL(dll_path)
         self._setup_function_prototypes()
         self.obj = None
         self.sample_rate = None
 
+    def _define_dll(self):
+        raise NotImplementedError
+
     def _setup_function_prototypes(self):
-        # Set up function prototypes according to the actual DLL functions
         raise NotImplementedError
 
     def __enter__(self) -> "DAQ122":

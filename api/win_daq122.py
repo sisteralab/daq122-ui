@@ -1,4 +1,5 @@
 import ctypes
+import os
 
 from api.base_daq122 import DAQ122
 
@@ -7,6 +8,8 @@ class WinDAQ122(DAQ122):
     """
     A class to interface with the DAQ122 data acquisition system in Windows.
     """
+    def _define_dll(self):
+        return os.path.join(os.getcwd(), r"libdaq-2.0.0.dll")
 
     def _setup_function_prototypes(self):
         # Set up function prototypes according to the actual DLL functions
