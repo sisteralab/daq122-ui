@@ -3,7 +3,7 @@
 
 extern "C" {
 
-DAQ122Handle DAQ122_Create() {
+DAQ122Handle DAQ122_New() {
     return new libdaq::device::DAQ122();
 }
 

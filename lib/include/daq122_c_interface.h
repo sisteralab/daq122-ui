@@ -8,7 +8,7 @@ extern "C" {
 
 typedef void* DAQ122Handle;
 
-DAQ122Handle DAQ122_Create();
+DAQ122Handle DAQ122_New();
 void DAQ122_Delete(DAQ122Handle handle);
 
 bool DAQ122_ConnectedDevice(DAQ122Handle handle);
