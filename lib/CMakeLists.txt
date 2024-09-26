@@ -4,6 +4,7 @@ project(daq122)
 set(CMAKE_CXX_STANDARD 11)
 
 include(${CMAKE_SOURCE_DIR}/cmake/daq.cmake)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(SOURCES
     src/daq122_c_interface.cpp

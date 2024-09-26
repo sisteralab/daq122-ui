@@ -22,7 +22,7 @@ else()
     set(DAQ_THIRD_PARTY_PATH "${DAQ_ROOT_PATH}/third_party")
 
     set(DAQ_INCLUDE_DIRS "${DAQ_ROOT_PATH}/include" "${DAQ_THIRD_PARTY_PATH}/include")
-    set(DAQ_LIBRARIES "${DAQ_ROOT_PATH}/lib/Linux/liblibdaq-${DAQ_VERSION}.so")
+    set(DAQ_LIBRARIES "${DAQ_ROOT_PATH}/lib/${CMAKE_HOST_SYSTEM_PROCESSOR}/liblibdaq-${DAQ_VERSION}.so")
 endif()
 
 include_directories(${DAQ_INCLUDE_DIRS})
