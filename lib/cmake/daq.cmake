@@ -1,5 +1,6 @@
 set(DAQ_VERSION 2.0.0)
 add_definitions(-DUSE_DAQ122)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     if(MSVC)
         if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -24,4 +25,4 @@ else()
     set(DAQ_LIBRARIES "${DAQ_ROOT_PATH}/lib/Linux/liblibdaq-${DAQ_VERSION}.so")
 endif()
 
-INCLUDE_DIRECTORIES(${DAQ_INCLUDE_DIRS})
+include_directories(${DAQ_INCLUDE_DIRS})
