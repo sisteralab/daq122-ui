@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "libdaq/device/daq122.h"
+#include "libdaq/device/DAQ122/daq122.h"
 
 using namespace libdaq::device;
 namespace py = pybind11;
