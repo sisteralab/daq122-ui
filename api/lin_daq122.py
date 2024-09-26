@@ -21,8 +21,8 @@ class LinDAQ122(DAQ122):
 
         self.dll.DAQ122_ConfigureSamplingParameters.argtypes = [
             ctypes.c_void_p,
-            ctypes.c_uint64,
-            ctypes.c_uint64
+            ctypes.c_int,
+            ctypes.c_int
         ]
         self.dll.DAQ122_ConfigureSamplingParameters.restype = ctypes.c_bool
 
