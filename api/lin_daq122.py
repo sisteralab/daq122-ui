@@ -10,7 +10,7 @@ class LinDAQ122(DAQ122):
 
     def _setup_function_prototypes(self):
         # Set up function prototypes according to the actual DLL functions
-        self.dll.DAQ122_Create.restype = ctypes.c_void_p
+        self.dll.DAQ122_New.restype = ctypes.c_void_p
         self.dll.DAQ122_Delete.argtypes = [ctypes.c_void_p]
 
         self.dll.DAQ122_InitializeDevice.argtypes = [ctypes.c_void_p]
