@@ -23,7 +23,7 @@ bool DAQ122_InitializeDevice(DAQ122Handle handle) {
     return static_cast<libdaq::device::DAQ122*>(handle)->InitializeDevice();
 }
 
-bool DAQ122_ConfigureSamplingParameters(DAQ122Handle handle, libdaq::device::DAQADCSampleRate sample_rate, libdaq::device::DAQVoltage voltage) {
+bool DAQ122_ConfigureSamplingParameters(DAQ122Handle handle, uint64_t DAQADCSampleRate sample_rate, uint64_t voltage) {
     return static_cast<libdaq::device::DAQ122*>(handle)->ConfigureADCParameters(
         static_cast<libdaq::device::DAQADCSampleRate>(sample_rate),
         static_cast<libdaq::device::DAQVoltage>(voltage)

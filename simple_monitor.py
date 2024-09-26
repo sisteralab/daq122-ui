@@ -4,7 +4,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-from api.win_dag122 import DAQ122
+from api.win_daq122 import DAQ122
 from api.structures import DAQVoltage, DAQSampleRate, DAQADCChannel
 
 # Example usage with context management

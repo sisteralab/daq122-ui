@@ -19,8 +19,11 @@ class WinDAQ122(DAQ122):
         self.dll.DAQ122_ConnectedDevice.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
         self.dll.DAQ122_ConnectedDevice.restype = ctypes.c_bool
 
-        self.dll.DAQ122_ConfigureSamplingParameters.argtypes = [ctypes.POINTER(ctypes.c_uint32), ctypes.c_uint64,
-                                                                ctypes.c_uint64]
+        self.dll.DAQ122_ConfigureSamplingParameters.argtypes = [
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.c_uint64,
+            ctypes.c_uint64
+        ]
         self.dll.DAQ122_ConfigureSamplingParameters.restype = ctypes.c_bool
 
         self.dll.DAQ122_ConfigADCChannel.argtypes = [ctypes.POINTER(ctypes.c_uint32), ctypes.c_uint64]
@@ -32,12 +35,11 @@ class WinDAQ122(DAQ122):
         self.dll.DAQ122_StopCollection.argtypes = [ctypes.POINTER(ctypes.c_uint32)]
         self.dll.DAQ122_StopCollection.restype = ctypes.c_bool
 
-        self.dll.DAQ122_TryReadData.argtypes = [ctypes.POINTER(ctypes.c_uint32),
-                                                ctypes.c_uint32,  # channel
-                                                ctypes.POINTER(ctypes.c_double),  # data
-                                                ctypes.c_uint32,  # read size
-                                                ctypes.c_uint32]  # timeout
+        self.dll.DAQ122_TryReadData.argtypes = [
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.c_uint32,  # channel
+            ctypes.POINTER(ctypes.c_double),  # data
+            ctypes.c_uint32,  # read size
+            ctypes.c_uint32  # timeout
+        ]
         self.dll.DAQ122_TryReadData.restype = ctypes.c_bool
-
-        self.dll.DAQ122_ADCDataBufferIsValid.argtypes = [ctypes.POINTER(ctypes.c_uint32), ctypes.c_uint32]
-        self.dll.DAQ122_ADCDataBufferIsValid.restype = ctypes.c_bool
