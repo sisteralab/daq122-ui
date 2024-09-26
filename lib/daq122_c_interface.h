@@ -19,7 +19,7 @@ bool DAQ122_ConfigureSamplingParameters(DAQ122Handle handle, libdaq::device::DAQ
 bool DAQ122_ConfigADCChannel(DAQ122Handle handle, uint8_t channel);
 bool DAQ122_StartCollection(DAQ122Handle handle);
 bool DAQ122_StopCollection(DAQ122Handle handle);
-bool DAQ122_TryReadData(DAQ122Handle handle, uint8_t channel, double *read_buffer, uint32_t read_size, uint32_t timeout)
+bool DAQ122_TryReadData(DAQ122Handle handle, uint8_t channel, double *read_buffer, uint32_t read_size, uint32_t timeout);
 
 #ifdef __cplusplus
 }
