@@ -21,7 +21,8 @@ set(CMAKE_PREFIX_PATH ${PYBIND11_CMAKE_DIR})
 
 find_package(pybind11 REQUIRED)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/third_party ${Python3_INCLUDE_DIRS} ${PYBIND11_INCLUDE_DIR})
+include(${CMAKE_SOURCE_DIR}/cmake/daq.cmake)
+include_directories(${Python3_INCLUDE_DIRS} ${PYBIND11_INCLUDE_DIR})
 
 add_library(daq122 MODULE daq122_bindings.cpp)
 

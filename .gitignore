@@ -2,5 +2,5 @@
 *__pycache__
 *.DS_Store
 *venv
-lib/build
-!lib/build/*.so
+*/build
+!*/build/*.so
