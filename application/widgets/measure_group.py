@@ -126,7 +126,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         State.is_measuring = False
 
     def plot_data(self, data: list):
-        self.parent().parent().plot_widget.add_plots(data)
+        self.parent().plot_widget.add_plots(data)
 
     @staticmethod
     def set_duration(value):
