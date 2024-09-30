@@ -19,7 +19,7 @@ class LogWidget(QtWidgets.QGroupBox):
         self.setLayout(layout)
 
     def set_log(self, text: str):
-        log = f"[{datetime.today().strftime('HH-mm-ss')}]{text}"
+        log = f"[{datetime.today().strftime('%H:%M:%S')}]{text}"
         self.content.setText(log)
 
 
