@@ -107,11 +107,12 @@ class DataTable(QWidget):
         self.tableView.setModel(self.model)
 
         self.tableView.setColumnWidth(DataTableColumns.ID.index, 30)
-        self.tableView.setColumnWidth(DataTableColumns.SAVED.index, 40)
+        self.tableView.setColumnWidth(DataTableColumns.SAVED.index, 60)
         header = self.tableView.horizontalHeader()
         for col in DataTableColumns:
             if col in (DataTableColumns.ID, DataTableColumns.SAVED):
                 continue
             header.setSectionResizeMode(col.index, QHeaderView.Stretch)
-        # self.tableView.setAutoScroll(True)
+
+        self.verticalHeader().setVisible(False)
 
