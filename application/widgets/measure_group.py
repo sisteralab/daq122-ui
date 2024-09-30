@@ -113,7 +113,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
     def start_measure(self):
         if not len(State.selected_channels):
             return
-
+        self.parent().plot_widget.clear()
         self.thread_measure = MeasureThread(self, int(self.duration.value()))
         self.thread_measure.data_plot.connect(self.plot_data)
         self.btn_start.setEnabled(False)
