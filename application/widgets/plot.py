@@ -54,9 +54,9 @@ class PlotWidget(QtWidgets.QWidget):
             if items.get(graph_id):
                 item = items.get(graph_id)
                 x_data = list(item.xData)
-                x_data.extend(dat["time"])
+                x_data.append(dat["time"])
                 y_data = list(item.yData)
-                y_data.extend(dat["voltage"])
+                y_data.append(dat["voltage"])
                 if dat["time"] > State.plot_window:
                     del x_data[0]
                     del y_data[0]
