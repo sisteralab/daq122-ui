@@ -118,6 +118,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_measure.data_plot.connect(self.plot_data)
         self.btn_start.setEnabled(False)
         self.thread_measure.finished.connect(lambda: self.btn_start.setEnabled(True))
+        self.thread_measure.start()
 
     @staticmethod
     def stop_measure():
