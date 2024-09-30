@@ -19,7 +19,7 @@ class MeasureThread(QtCore.QThread):
             data={
                 "sample_rate": State.sample_rate.value,
                 "voltage": State.voltage.Voltage5V.name,
-                "data": {},
+                "data": {channel: [] for channel in State.selected_channels},
             }
         )
         self.measure.save(finish=False)
@@ -53,12 +53,7 @@ class MeasureThread(QtCore.QThread):
                     if success:
                         duration = time.time() - start
                         read_data = list(data)
-                        channel_data = {
-                            "channel": f"AIN{channel}",
-                            "voltage": list(data),
-                            "time": duration,
-                        }
-                        self.measure.data["data"][channel] = channel_data
+                        self.measure.data["data"][channel].extend(read_data)
                         data_plot.append({"channel": channel, "voltage": read_data[0], "time": duration})
 
                         if duration > self.duration:
