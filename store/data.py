@@ -83,7 +83,7 @@ class MeasureManager:
     def save_by_index(cls, index: int) -> None:
         measure = cls.all()[index]
         results = measure.to_json()
-        caption = f"Saving {measure.type_display} started at {measure.started.strftime('%Y-%m-%d %H:%M:%S')}"
+        caption = f"Saving measure {measure.id}"
         try:
             filepath = QFileDialog.getSaveFileName(filter="*.json", caption=caption)[0]
             if not filepath:
@@ -193,7 +193,7 @@ class MeasureTableModel(QAbstractTableModel):
         self.beginResetModel()
         measures = self.manager.all()
         self._data = [
-            [m.id, m.type_display, m.comment, m.started, m.finished, m.saved]
+            [m.id, m.comment, m.started, m.finished, m.saved]
             for m in measures
         ]
         self.endResetModel()

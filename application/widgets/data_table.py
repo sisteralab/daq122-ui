@@ -75,7 +75,7 @@ class TableView(QtWidgets.QTableView):
         dlg = QMessageBox(self)
         dlg.setWindowTitle("Deleting data")
         dlg.setText(
-            f"Аre you sure you want to delete the data '{measure.type_display} {measure.finished.__str__()}'"
+            f"Аre you sure you want to delete the data {measure.id}"
         )
         dlg.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
