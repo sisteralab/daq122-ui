@@ -114,5 +114,5 @@ class DataTable(QWidget):
                 continue
             header.setSectionResizeMode(col.index, QHeaderView.Stretch)
 
-        self.verticalHeader().setVisible(False)
+        self.tableView.verticalHeader().setVisible(False)
 
