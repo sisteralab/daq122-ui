@@ -1,3 +1,5 @@
+import sys
+
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
@@ -5,6 +7,7 @@ from application.widgets import PlotWidget
 from application.widgets.data_table import DataTable
 from application.widgets.config_group import ConfigGroup
 from application.widgets.initialize_group import InitializeGroup
+from application.widgets.log import LogWidget, LogWriter
 from application.widgets.measure_group import MeasureGroup
 
 
@@ -18,6 +21,9 @@ class MainWidget(QtWidgets.QWidget):
 
         self.plot_widget = PlotWidget(self)
         left_vlayout.addWidget(self.plot_widget)
+
+        self.log_widget = LogWidget(self)
+        left_vlayout.addWidget(self.log_widget)
 
         self.initialize_group = InitializeGroup(self)
         right_vlayout.addWidget(self.initialize_group)
@@ -35,6 +41,8 @@ class MainWidget(QtWidgets.QWidget):
         hlayout.addLayout(right_vlayout)
 
         self.setLayout(hlayout)
+
+        sys.stdout = LogWriter(self.log_widget)
 
 
 class App(QMainWindow):

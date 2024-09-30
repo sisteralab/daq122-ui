@@ -58,7 +58,7 @@ class MeasureThread(QtCore.QThread):
                             "voltage": list(data),
                             "time": duration,
                         }
-                        self.measure.data["data"]["channel"] = channel_data
+                        self.measure.data["data"][channel] = channel_data
                         data_plot.append({"channel": channel, "voltage": read_data[0], "time": duration})
 
                         if duration > self.duration:
