@@ -44,7 +44,7 @@ class PlotWidget(QtWidgets.QWidget):
         self.plot.clear()
 
     def get_plot_items(self):
-        plot_item = self.graphWidget.getPlotItem()
+        plot_item = self.plot.getPlotItem()
         return {item.name(): item for item in plot_item.items}
 
     def add_plots(self, data: List[Dict]):
