@@ -14,4 +14,4 @@ class ChannelCheckBox(QtWidgets.QCheckBox):
         if state == QtCore.Qt.CheckState.Checked:
             State.selected_channels.append(self.channel)
         else:
-            State.selected_channels.pop(self.channel)
+            State.selected_channels.remove(self.channel)
