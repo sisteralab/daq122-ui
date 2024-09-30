@@ -65,5 +65,5 @@ class PlotWidget(QtWidgets.QWidget):
 
             pen = pg.mkPen(color=self.colors[dat["channel"]], width=2)
             self.plot.plot(
-                dat["time"], dat["voltage"], name=f"{graph_id}", pen=pen, symbolSize=6, symbolBrush=pen.color()
+                [dat["time"]], [dat["voltage"]], name=f"{graph_id}", pen=pen, symbolSize=6, symbolBrush=pen.color()
             )
