@@ -1,12 +1,18 @@
 from enum import IntEnum
 
 
-class DAQVoltage(IntEnum):
+class EnumMixin:
+    @classmethod
+    def get_by_index(cls, index: int):
+        return list(cls)[index]
+
+
+class DAQVoltage(EnumMixin, IntEnum):
     Voltage5V = 6
     Voltage10V = 7
 
 
-class DAQSampleRate(IntEnum):
+class DAQSampleRate(EnumMixin, IntEnum):
     SampleRate100 = 100
     SampleRate500 = 500
     SampleRate1K = 1000
@@ -17,7 +23,7 @@ class DAQSampleRate(IntEnum):
     SampleRate200K = 200000
 
 
-class DAQADCChannel(IntEnum):
+class DAQADCChannel(EnumMixin, IntEnum):
     NoChannel = 0b00000000
     AIN1 = 0b00000001
     AIN2 = 0b00000001 << 1
