@@ -12,3 +12,4 @@ git tag -a $Tag -m "Version $Tag"
 
 # Push
 git push origin --tags
+git push
