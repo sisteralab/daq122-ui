@@ -57,6 +57,6 @@ class App(QtWidgets.QMainWindow):
         self.height = 700
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setWindowTitle(title)
-        self.setWindowIcon(QIcon("./assets/logo_small.ico"))
+        self.setWindowIcon(QIcon("./assets/daq-logo.png"))
         self.setCentralWidget(MainWidget(self))
         self.show()
