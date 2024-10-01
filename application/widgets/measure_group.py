@@ -108,7 +108,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.read_elements.setRange(1, 1000)
         self.read_elements.setValue(State.read_elements_count.value)
         self.read_elements.valueChanged.connect(self.set_read_elements)
-        State.read_elements_count.signal_value.connect(lambda val: self.read_elements.setValue(val))
+        State.read_elements_count.signal_value.connect(lambda val: self.read_elements.setValue(int(val)))
 
         self.is_average = QtWidgets.QCheckBox(self)
         self.is_average.setText("Average EpR")

@@ -4,7 +4,7 @@ from api.structures import DAQSampleRate, DAQVoltage, DAQADCChannel
 
 
 class ReadElementsCountModel(QObject):
-    signal_value = pyqtSignal(float)
+    signal_value = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
