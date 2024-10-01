@@ -33,19 +33,17 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run build script
-      if: runner.os == 'Ubuntu'
       run: ./build.sh
 
     - name: Archive Release Asset
-      if: runner.os == 'Ubuntu'
-      run: tar -czvf ./dist/DAQ122_Ubuntu_${{ matrix.arch }}.tar.gz -C ./dist/DAQ122
+      run: tar -czvf ./dist/DAQ122_Lin_${{ matrix.arch }}.tar.gz -C ./dist/DAQ122
       shell: bash
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DAQ122_${{ runner.os }}_${{ matrix.arch }}
-        path: ./dist/DAQ122_${{ runner.os }}_${{ matrix.arch }}.tar.gz
+        name: DAQ122_Lin_${{ matrix.arch }}
+        path: ./dist/DAQ122_Lin_${{ matrix.arch }}.tar.gz
 
   release:
     needs: build
@@ -58,8 +56,8 @@ jobs:
     - name: Download Artifacts
       uses: actions/download-artifact@v4
       with:
-        name: DAQ122_Ubuntu_arm64
-        path: ./dist/DAQ122_Ubuntu_arm64.tar.gz
+        name: DAQ122_Lin_arm64
+        path: ./dist/DAQ122_Lin_arm64.tar.gz
 
     - name: List contents of dist directory
       run: ls -l ./dist
@@ -69,4 +67,4 @@ jobs:
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: ./dist/DAQ122_Ubuntu_arm64.tar.gz
+        files: ./dist/DAQ122_Lin_arm64.tar.gz
