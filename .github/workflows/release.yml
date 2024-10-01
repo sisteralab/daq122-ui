@@ -36,7 +36,7 @@ jobs:
       run: ./build.sh
 
     - name: Archive Release Asset
-      run: tar -czvf ./dist/DAQ122_Lin_${{ matrix.arch }}.tar.gz -C ./dist/DAQ122
+      run: tar -czvf ./dist/DAQ122_Lin_${{ matrix.arch }}.tar.gz -C ./dist DAQ122
       shell: bash
 
     - name: Upload Artifact
