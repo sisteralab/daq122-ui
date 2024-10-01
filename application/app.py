@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QIcon
 
 from application.widgets import PlotWidget
 from application.widgets.data_table import DataTable
@@ -45,7 +45,7 @@ class MainWidget(QtWidgets.QWidget):
         sys.stdout = LogWriter(self.log_widget)
 
 
-class App(QMainWindow):
+class App(QtWidgets.QMainWindow):
     def __init__(
         self,
         title: str = "DAQ122",
@@ -57,5 +57,6 @@ class App(QMainWindow):
         self.height = 700
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setWindowTitle(title)
+        self.setWindowIcon(QIcon("./assets/logo_small.png"))
         self.setCentralWidget(MainWidget(self))
         self.show()
