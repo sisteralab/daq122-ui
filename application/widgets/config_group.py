@@ -45,6 +45,8 @@ class ConfigGroup(QtWidgets.QGroupBox):
     @staticmethod
     def set_sample_rate(index):
         State.sample_rate = DAQSampleRate.get_by_index(index)
+        if State.read_elements_count.value > State.sample_rate.value:
+            State.read_elements_count.value = State.sample_rate.value
 
     @staticmethod
     def set_voltage(index):

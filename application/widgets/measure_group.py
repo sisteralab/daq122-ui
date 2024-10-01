@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSignal
 
@@ -23,6 +24,10 @@ class MeasureThread(QtCore.QThread):
             }
         )
         self.measure.save(finish=False)
+        self.read_elements_count = State.read_elements_count.value
+        self.sample_rate = State.sample_rate
+        self.voltage = State.voltage
+        self.is_average = State.is_average
 
     def run(self) -> None:
         DAQ122 = get_daq_class()
@@ -32,7 +37,7 @@ class MeasureThread(QtCore.QThread):
                 return
             print("Device Connected!")
 
-            if not daq.configure_sampling_parameters(State.voltage, State.sample_rate):
+            if not daq.configure_sampling_parameters(self.voltage, self.sample_rate):
                 self.finish()
                 return
             print("Sampling parameters configured")
@@ -49,12 +54,22 @@ class MeasureThread(QtCore.QThread):
             while State.is_measuring:
                 data_plot = []
                 for channel in State.selected_channels:
-                    success, data = daq.read_data(read_elements_count=State.sample_rate.value, channel_number=channel-1, timeout=5000)
+                    success, data = daq.read_data(
+                        read_elements_count=self.read_elements_count,
+                        channel_number=channel - 1,
+                        timeout=5000
+                    )
                     if success:
                         duration = time.time() - start
-                        read_data = list(data)
-                        self.measure.data["data"][channel].extend(read_data)
-                        data_plot.append({"channel": channel, "voltage": read_data[0], "time": duration})
+                        read_data = np.array(data)
+                        mean = np.mean(read_data)
+                        if self.is_average:
+                            self.measure.data["data"][channel].append(mean)
+                        else:
+                            self.measure.data["data"][channel].extend(read_data)
+                        data_plot.append({"channel": channel, "voltage": mean, "time": duration})
+
+                        del data, read_data
 
                         if duration > self.duration:
                             break
@@ -89,9 +104,23 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.plot_window.setValue(State.plot_window)
         self.plot_window.valueChanged.connect(self.set_plot_window)
 
+        self.read_elements = QtWidgets.QSpinBox(self)
+        self.read_elements.setRange(1, 1000)
+        self.read_elements.setValue(State.read_elements_count.value)
+        self.read_elements.valueChanged.connect(self.set_read_elements)
+        State.read_elements_count.signal_value.connect(lambda val: self.read_elements.setValue(val))
+
+        self.is_average = QtWidgets.QCheckBox(self)
+        self.is_average.setText("Average EpR")
+        self.is_average.setToolTip("Averaging Elements per Request")
+        self.is_average.stateChanged.connect(self.set_average)
+
+        flayout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.setFormAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.addRow("Time, s:", self.duration)
         flayout.addRow("Plot Window, s:", self.plot_window)
+        flayout.addRow("Elements per Request:", self.read_elements)
+        flayout.addRow(self.is_average)
 
         self.btn_start = QtWidgets.QPushButton("Start", self)
         self.btn_start.clicked.connect(self.start_measure)
@@ -130,3 +159,12 @@ class MeasureGroup(QtWidgets.QGroupBox):
     @staticmethod
     def set_plot_window(value):
         State.plot_window = int(value)
+
+    @staticmethod
+    def set_read_elements(value):
+        State.read_elements_count.value = int(value)
+
+    @staticmethod
+    def set_average(state):
+        value = state == QtCore.Qt.CheckState.Checked
+        State.is_average = value

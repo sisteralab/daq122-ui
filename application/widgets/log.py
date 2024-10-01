@@ -15,12 +15,19 @@ class LogWidget(QtWidgets.QGroupBox):
         self.content.setWordWrap(True)
         self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
-        layout.addWidget(self.content)
+        self.btn_clear = QtWidgets.QPushButton("Clear", self)
+        self.btn_clear.clicked.connect(self.clear_log)
+
+        layout.addWidget(self.content, alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.btn_clear, alignment=Qt.AlignmentFlag.AlignRight)
         self.setLayout(layout)
 
     def set_log(self, text: str):
         log = f"[{datetime.today().strftime('%H:%M:%S')}]{text}"
         self.content.setText(log)
+
+    def clear_log(self):
+        self.content.setText("--")
 
 
 class LogWriter:
