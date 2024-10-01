@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets
 
 from api import get_daq_class
+from api.exceptions import DeviceError
 
 
 class InitializeGroup(QtWidgets.QGroupBox):
@@ -23,6 +24,9 @@ class InitializeGroup(QtWidgets.QGroupBox):
 
     def initialize(self):
         DAQ122 = get_daq_class()
-        with DAQ122() as daq:
-            if daq.is_connected():
-                self.status.setText("Success Connected!")
+        try:
+            with DAQ122() as daq:
+                if daq.is_connected():
+                    self.status.setText("Success Connected!")
+        except DeviceError as e:
+            self.status.setText(str(e))

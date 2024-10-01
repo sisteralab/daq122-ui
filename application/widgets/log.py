@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from PyQt5 import QtWidgets
@@ -11,32 +12,34 @@ class LogWidget(QtWidgets.QGroupBox):
         self.setTitle("Log")
 
         layout = QtWidgets.QHBoxLayout()
-        self.content = QtWidgets.QLabel("--", self)
-        self.content.setWordWrap(True)
+        self.content = QtWidgets.QTextEdit(self)
+        self.content.setReadOnly(True)
         self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.content.setText('--')
 
         self.btn_clear = QtWidgets.QPushButton("Clear", self)
         self.btn_clear.clicked.connect(self.clear_log)
 
-        layout.addWidget(self.content, alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.content)
         layout.addWidget(self.btn_clear, alignment=Qt.AlignmentFlag.AlignRight)
         self.setLayout(layout)
 
     def set_log(self, text: str):
-        log = f"[{datetime.today().strftime('%H:%M:%S')}]{text}"
-        self.content.setText(log)
+        lines = self.content.toPlainText().split('\n')
+        lines.append(text)
+        lines = lines[-50:]
+        self.content.setPlainText('\n'.join(lines))
+        self.content.verticalScrollBar().setValue(self.content.verticalScrollBar().maximum())
 
     def clear_log(self):
         self.content.setText("--")
 
 
-class LogWriter:
+class LogHandler(logging.Handler):
     def __init__(self, log_widget):
+        super().__init__()
         self.log_widget = log_widget
 
-    def write(self, message):
-        if message.strip():
-            self.log_widget.set_log(message.strip())
-
-    def flush(self):
-        pass
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.log_widget.set_log(log_entry)
