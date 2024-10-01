@@ -52,11 +52,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout code
+        uses: actions/checkout@v4
+
     - name: Download Artifacts
       uses: actions/download-artifact@v4
       with:
         name: DAQ122_Lin_arm64
-        path: DAQ122_Lin_arm64.tar.gz
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
