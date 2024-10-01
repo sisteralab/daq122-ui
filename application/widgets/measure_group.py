@@ -1,3 +1,4 @@
+import logging
 import time
 
 import numpy as np
@@ -10,8 +11,12 @@ from store.data import MeasureManager
 from store.state import State
 
 
+logger = logging.getLogger(__name__)
+
+
 class MeasureThread(QtCore.QThread):
     data_plot = pyqtSignal(list)
+    log = pyqtSignal(str)
 
     def __init__(self, parent, duration: int):
         super().__init__(parent)
@@ -28,6 +33,7 @@ class MeasureThread(QtCore.QThread):
         self.sample_rate = State.sample_rate
         self.voltage = State.voltage
         self.is_average = State.is_average
+        self.selected_channels = sorted(State.selected_channels)
 
     def run(self) -> None:
         DAQ122 = get_daq_class()
@@ -35,17 +41,17 @@ class MeasureThread(QtCore.QThread):
             if not daq.is_connected():
                 self.finish()
                 return
-            print("Device Connected!")
+            self.log.emit("Device Connected!")
 
             if not daq.configure_sampling_parameters(self.voltage, self.sample_rate):
                 self.finish()
                 return
-            print("Sampling parameters configured")
+            self.log.emit("Sampling parameters configured")
 
             if not daq.config_adc_channel(DAQADCChannel.AIN_ALL):
                 self.finish()
                 return
-            print("Channels configured")
+            self.log.emit("Channels configured")
 
             daq.start_collection()
             time.sleep(1)  # Wait for data to accumulate
@@ -53,7 +59,7 @@ class MeasureThread(QtCore.QThread):
             start = time.time()
             while State.is_measuring:
                 data_plot = []
-                for channel in State.selected_channels:
+                for channel in self.selected_channels:
                     success, data = daq.read_data(
                         read_elements_count=self.read_elements_count,
                         channel_number=channel - 1,
@@ -72,7 +78,7 @@ class MeasureThread(QtCore.QThread):
                         del data, read_data
 
                         if duration > self.duration:
-                            break
+                            State.is_measuring = False
                 if not data_plot:
                     continue
                 self.data_plot.emit(data_plot)
@@ -113,12 +119,13 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.is_average = QtWidgets.QCheckBox(self)
         self.is_average.setText("Average EpR")
         self.is_average.setToolTip("Averaging Elements per Request")
+        self.is_average.setChecked(State.is_average)
         self.is_average.stateChanged.connect(self.set_average)
 
         flayout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.setFormAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        flayout.addRow("Time, s:", self.duration)
-        flayout.addRow("Plot Window, s:", self.plot_window)
+        flayout.addRow("Measuring Time, s:", self.duration)
+        flayout.addRow("Plot points count:", self.plot_window)
         flayout.addRow("Elements per Request:", self.read_elements)
         flayout.addRow(self.is_average)
 
@@ -140,6 +147,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.parent().plot_widget.clear()
         self.thread_measure = MeasureThread(self, int(self.duration.value()))
         self.thread_measure.data_plot.connect(self.plot_data)
+        self.thread_measure.log.connect(lambda x: logger.info(x))
         self.btn_start.setEnabled(False)
         self.thread_measure.finished.connect(lambda: self.btn_start.setEnabled(True))
         State.is_measuring = True

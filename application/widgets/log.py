@@ -15,7 +15,6 @@ class LogWidget(QtWidgets.QGroupBox):
         self.content = QtWidgets.QTextEdit(self)
         self.content.setReadOnly(True)
         self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.content.setText('--')
 
         self.btn_clear = QtWidgets.QPushButton("Clear", self)
         self.btn_clear.clicked.connect(self.clear_log)
@@ -32,7 +31,7 @@ class LogWidget(QtWidgets.QGroupBox):
         self.content.verticalScrollBar().setValue(self.content.verticalScrollBar().maximum())
 
     def clear_log(self):
-        self.content.setText("--")
+        self.content.clear()
 
 
 class LogHandler(logging.Handler):
@@ -43,3 +42,15 @@ class LogHandler(logging.Handler):
     def emit(self, record):
         log_entry = self.format(record)
         self.log_widget.set_log(log_entry)
+
+
+class StdoutRedirector:
+    def __init__(self, log_widget):
+        self.log_widget = log_widget
+
+    def write(self, message):
+        if message.strip():
+            self.log_widget.set_log(message.strip())
+
+    def flush(self):
+        pass

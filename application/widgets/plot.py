@@ -57,13 +57,13 @@ class PlotWidget(QtWidgets.QWidget):
                 x_data.append(dat["time"])
                 y_data = list(item.yData)
                 y_data.append(dat["voltage"])
-                if dat["time"] > State.plot_window:
+                if len(x_data) > State.plot_window:
                     del x_data[0]
                     del y_data[0]
                 item.setData(x_data, y_data)
                 continue
 
-            pen = pg.mkPen(color=self.colors[dat["channel"]], width=2)
+            pen = pg.mkPen(color=self.colors[dat["channel"] - 1], width=2)
             self.plot.plot(
                 [dat["time"]], [dat["voltage"]], name=f"{graph_id}", pen=pen, symbolSize=6, symbolBrush=pen.color()
             )

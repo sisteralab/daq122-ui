@@ -1,3 +1,5 @@
+from typing import List
+
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 
 from api.structures import DAQSampleRate, DAQVoltage, DAQADCChannel
@@ -26,10 +28,10 @@ class State:
     sample_rate: DAQSampleRate = DAQSampleRate.SampleRate500
     voltage: DAQVoltage = DAQVoltage.Voltage5V
     channel: DAQADCChannel = DAQADCChannel.AIN_ALL
-    selected_channels: list = []
+    selected_channels: List[int] = []
     is_measuring: bool = False
     plot_window: int = 20
     duration: int = 60
     read_elements_count = ReadElementsCountModel()
-    is_average: bool = False
+    is_average: bool = True
 

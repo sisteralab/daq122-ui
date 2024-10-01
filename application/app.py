@@ -8,7 +8,7 @@ from application.widgets import PlotWidget
 from application.widgets.data_table import DataTable
 from application.widgets.config_group import ConfigGroup
 from application.widgets.initialize_group import InitializeGroup
-from application.widgets.log import LogWidget, LogHandler
+from application.widgets.log import LogWidget, LogHandler, StdoutRedirector
 from application.widgets.measure_group import MeasureGroup
 
 
@@ -43,6 +43,7 @@ class MainWidget(QtWidgets.QWidget):
 
         self.setLayout(hlayout)
 
+        # logging config
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
 
@@ -54,6 +55,8 @@ class MainWidget(QtWidgets.QWidget):
 
         logger.addHandler(log_widget_handler)
         logger.addHandler(stream_handler)
+
+        sys.stdout = StdoutRedirector(self.log_widget)
 
 
 class App(QtWidgets.QMainWindow):
