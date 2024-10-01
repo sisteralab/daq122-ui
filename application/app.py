@@ -57,6 +57,6 @@ class App(QtWidgets.QMainWindow):
         self.height = 700
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setWindowTitle(title)
-        self.setWindowIcon(QIcon("./assets/logo_small.png"))
+        self.setWindowIcon(QIcon("./assets/logo_small.ico"))
         self.setCentralWidget(MainWidget(self))
         self.show()

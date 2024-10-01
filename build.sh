@@ -1,4 +1,4 @@
 #! /bin/bash
 
-pyinstaller main.py -n DAQ122 --onedir --icon="./assets/logo2.png" --noconsole -y --add-data="assets:assets"
+pyinstaller main.py -n DAQ122 --onedir --icon="./assets/logo.ico" --noconsole -y --add-data="assets:assets"
 cp ./daq122.so ./dist/DAQ122
