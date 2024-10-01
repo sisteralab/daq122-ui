@@ -1,5 +1,4 @@
 import ctypes
-import os
 
 from api.structures import DAQVoltage, DAQSampleRate, DAQADCChannel
 
