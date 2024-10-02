@@ -216,7 +216,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
             duration=int(self.duration.value()),
             data_queue=self.data_queue,
             log_queue=self.log_queue,
-            state=self.is_measuring,
+            is_measuring=self.is_measuring,
         )
         self.process_receiver.start()
 
@@ -224,7 +224,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
             data_queue=self.data_queue,
             processed_queue=self.processed_queue,
             measure=self.measure,
-            state=self.is_measuring,
+            is_measuring=self.is_measuring,
         )
         self.process_processor.start()
 
