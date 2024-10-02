@@ -1,6 +1,6 @@
 import logging
 import time
-from multiprocessing import Queue, Process
+from multiprocessing import Process, Manager
 from typing import Dict, List
 
 import numpy as np
@@ -17,11 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiverProcess(Process):
-    def __init__(self, duration: int, data_queue, log_queue):
+    def __init__(self, duration: int, data_queue, log_queue, state):
         super().__init__()
         self.duration = duration
         self.data_queue = data_queue
         self.log_queue = log_queue
+        self.state = state
         self.read_elements_count = int(State.read_elements_count.value)
         self.sample_rate = State.sample_rate
         self.voltage = State.voltage
@@ -55,12 +56,10 @@ class ReceiverProcess(Process):
                 time.sleep(1)  # Wait for data to accumulate
 
                 start = time.time()
-                while State.is_measuring:
+                while self.state["is_measuring"]:
                     for channel in self.selected_channels:
                         success, data = daq.read_data(
-                            read_elements_count=self.read_elements_count,
-                            channel_number=channel - 1,
-                            timeout=5000
+                            read_elements_count=self.read_elements_count, channel_number=channel - 1, timeout=5000
                         )
                         if success:
                             duration = time.time() - start
@@ -75,15 +74,17 @@ class ReceiverProcess(Process):
 
     def finish(self):
         self.log_queue.put("Receiver finished.")
+        self.state["is_measuring"] = False
 
 
 class ProcessorProcess(Process):
-    def __init__(self, data_queue, processed_queue, measure):
+    def __init__(self, data_queue, processed_queue, measure, state):
         super().__init__()
         self.data_queue = data_queue
         self.processed_queue = processed_queue
         self.is_average = State.is_average
         self.measure = measure
+        self.state = state
 
     def run(self):
         def function():
@@ -96,7 +97,7 @@ class ProcessorProcess(Process):
                 self.measure.data["data"][data["channel"]]["voltage"].append(data["voltage"])
             self.measure.data["data"][data["channel"]]["time"].append(data["time"])
 
-        while State.is_measuring:
+        while self.state["is_measuring"]:
             if not self.data_queue.empty():
                 function()
 
@@ -117,6 +118,7 @@ class PlotterThread(QtCore.QThread):
     def run(self):
         def function():
             self.plot_data.emit([self.processed_queue.get()])
+
         while State.is_measuring:
             if not self.processed_queue.empty():
                 function()
@@ -139,6 +141,9 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.processed_queue = None
         self.log_queue = None
         self.measure = None
+        self.manager = Manager()
+        self.state = self.manager.dict()
+        self.state["is_measuring"] = False
 
         self.setTitle("Measure")
 
@@ -192,9 +197,9 @@ class MeasureGroup(QtWidgets.QGroupBox):
             return
         self.parent().plot_widget.clear()
 
-        self.data_queue = Queue()
-        self.processed_queue = Queue()
-        self.log_queue = Queue()
+        self.data_queue = self.manager.Queue()
+        self.processed_queue = self.manager.Queue()
+        self.log_queue = self.manager.Queue()
 
         data = {channel: {"voltage": [], "time": []} for channel in State.selected_channels}
         self.measure = MeasureManager.create(
@@ -207,10 +212,14 @@ class MeasureGroup(QtWidgets.QGroupBox):
         )
         self.measure.save(finish=False)
 
-        self.process_receiver = ReceiverProcess(duration=int(self.duration.value()), data_queue=self.data_queue, log_queue=self.log_queue)
+        self.process_receiver = ReceiverProcess(
+            duration=int(self.duration.value()), data_queue=self.data_queue, log_queue=self.log_queue, state=self.state
+        )
         self.process_receiver.start()
 
-        self.process_processor = ProcessorProcess(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
+        self.process_processor = ProcessorProcess(
+            data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure, state=self.state
+        )
         self.process_processor.start()
 
         self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
@@ -219,7 +228,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_plotter.finished.connect(lambda: self.btn_start.setEnabled(True))
 
         self.btn_start.setEnabled(False)
-        State.is_measuring = True
+        self.state["is_measuring"] = True
         self.thread_plotter.start()
 
         self.log_timer = QtCore.QTimer(self)
@@ -233,9 +242,10 @@ class MeasureGroup(QtWidgets.QGroupBox):
             if message == "Receiver finished.":
                 self.stop_measure()
 
-    @staticmethod
-    def stop_measure():
+    def stop_measure(self):
         State.is_measuring = False
+        if self.state:
+            self.state["is_measuring"] = False
         logger.info("Wait to finish measuring...")
 
     def finish_measure(self):
