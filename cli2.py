@@ -7,6 +7,7 @@ from tabulate import tabulate
 from api import get_daq_class
 from api.exceptions import DeviceError
 from api.structures import DAQSampleRate, DAQVoltage, DAQADCChannel
+import curses
 
 
 def save_to_hdf5(filename, data, channels, sample_rate, voltage, duration, averaging, epr):
@@ -24,17 +25,31 @@ def save_to_hdf5(filename, data, channels, sample_rate, voltage, duration, avera
 
 
 def display_table(queue, channels):
-    while True:
-        data = queue.get()
-        if data is None:
-            break
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    stdscr.nodelay(True)
 
-        table_data = [["Channel", "Time", "Average Data", "Count"]]
-        for channel, (duration, average_data, count) in zip(channels, data):
-            table_data.append([channel, f"{duration:5.3f}", f"{average_data:8.6f}", count])
+    try:
+        while True:
+            data = queue.get()
+            if data is None:
+                break
 
-        print("\033[H\033[J")  # Очистка консоли
-        print(tabulate(table_data, headers="firstrow", tablefmt="grid"))
+            stdscr.clear()
+            table_data = [["Channel", "Time", "Average Data", "Count"]]
+            for channel, (duration, average_data, count) in zip(channels, data):
+                table_data.append([channel, f"{duration:5.3f}", f"{average_data:8.6f}", count])
+
+            table_str = tabulate(table_data, headers="firstrow", tablefmt="grid")
+            stdscr.addstr(0, 0, table_str)
+            stdscr.refresh()
+            time.sleep(0.1)  # Пауза для обновления консоли
+    finally:
+        curses.nocbreak()
+        stdscr.keypad(False)
+        curses.echo()
+        curses.endwin()
 
 
 def main():
@@ -43,10 +58,12 @@ def main():
         description='Measuring via DAQ122 ADC',
         epilog='LOL'
     )
-    parser.add_argument('-s', '--sample-rate', action='store', default=DAQSampleRate.SampleRate500.value, choices=[sr.value for sr in DAQSampleRate], type=int)
+    parser.add_argument('-s', '--sample-rate', action='store', default=DAQSampleRate.SampleRate500.value,
+                        choices=[sr.value for sr in DAQSampleRate], type=int)
     parser.add_argument('-e', '--epr', action='store', default=100, type=int)
     parser.add_argument('-c', '--channel', action='append', choices=list(range(1, 9)), type=int)
-    parser.add_argument('-v', '--voltage', action='store', default="Voltage5V", choices=[vt.name for vt in DAQVoltage], type=str)
+    parser.add_argument('-v', '--voltage', action='store', default="Voltage5V", choices=[vt.name for vt in DAQVoltage],
+                        type=str)
     parser.add_argument('-a', '--average', action='store_true')
     parser.add_argument('-d', '--duration', default=60, type=int)
     parser.add_argument('-o', '--output', default='data.h5', type=str, help='Output HDF5 file')
@@ -83,7 +100,8 @@ def main():
                     time.sleep(args.epr / sample_rate)
                     channel_data = []
                     for channel_index, channel in enumerate(args.channel):
-                        success, data = daq.read_data(read_elements_count=args.epr, channel_number=channel, timeout=5000)
+                        success, data = daq.read_data(read_elements_count=args.epr, channel_number=channel,
+                                                      timeout=5000)
                         if success:
                             duration = time.time() - start
                             read_data = data[:args.epr]
@@ -98,17 +116,19 @@ def main():
 
                             if duration > args.duration:
                                 break
+
                     queue.put(channel_data)
                     if duration > args.duration:
                         break
 
     except (DeviceError, KeyboardInterrupt) as e:
-        ...
+        print(f"Error: {e}")
     finally:
         queue.put(None)
         display_process.join()
         data_to_save = [np.array(channel_data) for channel_data in data_to_save]
-        save_to_hdf5(args.output, data_to_save, args.channel, sample_rate.value, voltage.name, args.duration, args.average, args.epr)
+        save_to_hdf5(args.output, data_to_save, args.channel, sample_rate.value, voltage.name, args.duration,
+                     args.average, args.epr)
         print(f"\nData saved to {args.output}")
 
 
