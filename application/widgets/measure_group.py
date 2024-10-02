@@ -155,8 +155,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
             return
         self.parent().plot_widget.clear()
         self.thread_measure = MeasureThread(self, int(self.duration.value()))
-        if self.is_plot_data.isChecked():
-            self.thread_measure.data_plot.connect(self.plot_data)
+        self.thread_measure.data_plot.connect(self.plot_data)
         self.thread_measure.log.connect(lambda x: logger.info(x))
         self.btn_start.setEnabled(False)
         self.thread_measure.finished.connect(self.finish_measure)
