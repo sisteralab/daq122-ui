@@ -89,7 +89,7 @@ class MeasureManager:
             finished = datetime.now()
         caption = f"Saving measure {measure.id}"
         try:
-            default_filename = f"{measure.comment}.h5"
+            default_filename = f"{measure.comment}"
             default_filename = re.sub(r'[^\w\s-]', '', default_filename).strip()
             default_filename = re.sub(r'[-\s]+', '-', default_filename)
             filepath, _ = QFileDialog.getSaveFileName(filter="*.h5", caption=caption, directory=default_filename)
