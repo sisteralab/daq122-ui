@@ -212,13 +212,14 @@ class MeasureGroup(QtWidgets.QGroupBox):
         )
         self.measure.save(finish=False)
 
+        self.is_measuring.value = True
+
         self.process_receiver = ReceiverProcess(
             duration=int(self.duration.value()),
             data_queue=self.data_queue,
             log_queue=self.log_queue,
             is_measuring=self.is_measuring,
         )
-        self.process_receiver.start()
 
         self.process_processor = ProcessorProcess(
             data_queue=self.data_queue,
@@ -226,7 +227,6 @@ class MeasureGroup(QtWidgets.QGroupBox):
             measure=self.measure,
             is_measuring=self.is_measuring,
         )
-        self.process_processor.start()
 
         self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
         self.thread_plotter.plot_data.connect(self.plot_data)
@@ -234,12 +234,15 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_plotter.finished.connect(lambda: self.btn_start.setEnabled(True))
 
         self.btn_start.setEnabled(False)
-        self.is_measuring.value = True
+        self.process_receiver.start()
+        self.process_processor.start()
         self.thread_plotter.start()
+
+        time.sleep(1)
 
         self.log_timer = QtCore.QTimer(self)
         self.log_timer.timeout.connect(self.check_log_queue)
-        self.log_timer.start(100)
+        self.log_timer.start(2000)
 
     def check_log_queue(self):
         while not self.log_queue.empty():
@@ -247,6 +250,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
             logger.info(message)
             if message == "Receiver finished.":
                 self.stop_measure()
+                self.log_timer.stop()
 
     def stop_measure(self):
         State.is_measuring = False
