@@ -30,6 +30,7 @@ class State:
     channel: DAQADCChannel = DAQADCChannel.AIN_ALL
     selected_channels: List[int] = []
     is_measuring: bool = False
+    is_waiting: bool = False
     plot_window: int = 20
     duration: int = 60
     read_elements_count = ReadElementsCountModel()
