@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from typing import Union, Dict, Any
 
+import h5py
 from PyQt5 import QtGui
 from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 from PyQt5.QtWidgets import QFileDialog
@@ -82,16 +83,36 @@ class MeasureManager:
     @classmethod
     def save_by_index(cls, index: int) -> None:
         measure = cls.all()[index]
-        results = measure.to_json()
+        finished = measure.finished
+        if finished == "--":
+            finished = datetime.now()
         caption = f"Saving measure {measure.id}"
         try:
-            filepath = QFileDialog.getSaveFileName(filter="*.json", caption=caption)[0]
+            # Получаем комментарий и используем его в качестве начального имени файла
+            comment = str(measure.comment)
+            comment.replace(" ", "_")
+            comment.replace("\n", "_")
+            comment.replace("\\", "_")
+            comment.replace("/", "_")
+            default_filename = f"{comment[:50]}.h5"
+            filepath, _ = QFileDialog.getSaveFileName(filter="*.h5", caption=caption, directory=default_filename)
             if not filepath:
                 return
-            if not filepath.endswith(".json"):
-                filepath += ".json"
-            with open(filepath, "w", encoding="utf-8") as file:
-                json.dump(results, file, ensure_ascii=False, indent=4)
+            if not filepath.endswith(".h5"):
+                filepath += ".h5"
+            with h5py.File(filepath, 'w') as hdf:
+                hdf.attrs['id'] = measure.id
+                hdf.attrs['comment'] = measure.comment
+                hdf.attrs['started'] = measure.started.strftime("%Y-%m-%d %H:%M:%S")
+                hdf.attrs['finished'] = finished.strftime("%Y-%m-%d %H:%M:%S")
+
+                data_group = hdf.create_group('data')
+                data_group.attrs['sample_rate'] = measure.data['sample_rate']
+                data_group.attrs['voltage'] = measure.data['voltage']
+                data_group.attrs['epr'] = measure.data['epr']
+
+                for key, value in measure.data['data'].items():
+                    data_group.create_dataset(f'channel_{key}', data=value)
             measure.saved = True
             measure.save(finish=False)
         except (IndexError, FileNotFoundError):

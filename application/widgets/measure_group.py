@@ -25,6 +25,7 @@ class MeasureThread(QtCore.QThread):
             data={
                 "sample_rate": State.sample_rate.value,
                 "voltage": State.voltage.Voltage5V.name,
+                "epr": State.read_elements_count.value,
                 "data": {channel: [] for channel in State.selected_channels},
             }
         )
@@ -68,11 +69,12 @@ class MeasureThread(QtCore.QThread):
                     )
                     if success:
                         duration = time.time() - start
-                        mean = np.mean(data)
+                        measured_data = data[:self.read_elements_count]
+                        mean = np.mean(measured_data)
                         if self.is_average:
                             self.measure.data["data"][channel].append(mean)
                         else:
-                            self.measure.data["data"][channel].extend(list(data))
+                            self.measure.data["data"][channel].extend(list(measured_data))
 
                         data_plot.append({"channel": channel, "voltage": mean, "time": duration})
 
