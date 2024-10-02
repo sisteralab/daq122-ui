@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiverThread(QtCore.QThread):
+    stop_signal = pyqtSignal()
+
     def __init__(self, duration: int, data_queue):
         super().__init__()
         self.duration = duration
@@ -56,7 +58,7 @@ class ReceiverThread(QtCore.QThread):
                         duration = time.time() - start
                         self.data_queue.put({"channel": channel, "voltage": list(data), "time": duration})
                         if duration > self.duration:
-                            State.is_measuring = False
+                            self.stop_signal.emit()
 
         self.finish()
 
@@ -180,6 +182,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.measure.save(finish=False)
 
         self.thread_receiver = ReceiverThread(duration=int(self.duration.value()), data_queue=self.data_queue)
+        self.thread_receiver.stop_signal.connect(self.stop_measure)
         self.thread_receiver.finished.connect(lambda: self.btn_start.setEnabled(True))
 
         self.thread_processor = ProcessorThread(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
