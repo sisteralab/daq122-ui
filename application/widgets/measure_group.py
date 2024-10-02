@@ -1,9 +1,11 @@
 import logging
 import time
 from multiprocessing import Queue
+from typing import Dict, List
 
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import pyqtSignal
 
 from api import get_daq_class
 from api.structures import DAQADCChannel
@@ -86,17 +88,17 @@ class ProcessorThread(QtCore.QThread):
 
 
 class PlotterThread(QtCore.QThread):
-    def __init__(self, plot_widget, processed_queue):
+    plot_data = pyqtSignal(list)
+
+    def __init__(self, processed_queue):
         super().__init__()
-        self.plot_widget = plot_widget
         self.processed_queue = processed_queue
         self.data = []
 
     def run(self):
         while State.is_measuring:
             if not self.processed_queue.empty():
-                data = self.processed_queue.get()
-                self.plot_widget.add_plots([data])
+                self.plot_data.emit([self.processed_queue.get()])
 
         self.finished.emit()
 
@@ -211,7 +213,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_receiver.finished.connect(lambda: self.btn_start.setEnabled(True))
 
         self.thread_processor = ProcessorThread(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
-        self.thread_plotter = PlotterThread(plot_widget=self.parent().plot_widget, processed_queue=self.processed_queue)
+        self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
+        self.thread_plotter.plot_data.connect(self.plot_data)
 
         self.btn_start.setEnabled(False)
         State.is_measuring = True
@@ -246,6 +249,9 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_remaining_data_processor = None
         self.measure = None
         logger.info("Measure finished!")
+
+    def plot_data(self, data: List[Dict]):
+        self.parent().plot_widget.add_plots(data)
 
     @staticmethod
     def set_duration(value):
