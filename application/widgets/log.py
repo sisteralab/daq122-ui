@@ -24,10 +24,10 @@ class LogWidget(QtWidgets.QGroupBox):
         self.setLayout(layout)
 
     def set_log(self, text: str):
-        lines = self.content.toPlainText().split('\n')
+        lines = self.content.toPlainText().split("\n")
         lines.append(text)
         lines = lines[-50:]
-        self.content.setPlainText('\n'.join(lines))
+        self.content.setPlainText("\n".join(lines))
         self.content.verticalScrollBar().setValue(self.content.verticalScrollBar().maximum())
 
     def clear_log(self):

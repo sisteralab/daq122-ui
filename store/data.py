@@ -192,10 +192,7 @@ class MeasureTableModel(QAbstractTableModel):
     def updateData(self):
         self.beginResetModel()
         measures = self.manager.all()
-        self._data = [
-            [m.id, m.comment, m.started, m.finished, m.saved]
-            for m in measures
-        ]
+        self._data = [[m.id, m.comment, m.started, m.finished, m.saved] for m in measures]
         self.endResetModel()
 
     def headerData(self, section, orientation, role):

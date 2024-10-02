@@ -24,11 +24,7 @@ class LinDAQ122(DAQ122):
         self.dll.DAQ122_ConnectedDevice.argtypes = [ctypes.c_void_p]
         self.dll.DAQ122_ConnectedDevice.restype = ctypes.c_bool
 
-        self.dll.DAQ122_ConfigureSamplingParameters.argtypes = [
-            ctypes.c_void_p,
-            ctypes.c_int,
-            ctypes.c_int
-        ]
+        self.dll.DAQ122_ConfigureSamplingParameters.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
         self.dll.DAQ122_ConfigureSamplingParameters.restype = ctypes.c_bool
 
         self.dll.DAQ122_ConfigADCChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint64]
@@ -45,7 +41,7 @@ class LinDAQ122(DAQ122):
             ctypes.c_uint32,  # channel
             ctypes.POINTER(ctypes.c_double),  # data
             ctypes.c_uint32,  # read_size
-            ctypes.c_uint32  # timeout
+            ctypes.c_uint32,  # timeout
         ]
         self.dll.DAQ122_TryReadData.restype = ctypes.c_bool
 

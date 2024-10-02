@@ -74,12 +74,8 @@ class TableView(QtWidgets.QTableView):
 
         dlg = QMessageBox(self)
         dlg.setWindowTitle("Deleting data")
-        dlg.setText(
-            f"Аre you sure you want to delete the data {measure.id}"
-        )
-        dlg.setStandardButtons(
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
+        dlg.setText(f"Аre you sure you want to delete the data {measure.id}")
+        dlg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         dlg.setIcon(QMessageBox.Icon.Question)
         button = dlg.exec()
 
@@ -115,4 +111,3 @@ class DataTable(QWidget):
             header.setSectionResizeMode(col.index, QHeaderView.Stretch)
 
         self.tableView.verticalHeader().setVisible(False)
-

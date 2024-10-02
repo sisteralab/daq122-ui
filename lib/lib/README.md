@@ -40,4 +40,3 @@
 ## 😭 Bug反馈
 
 请前往[DAQ122 Issues](https://gitee.com/Lockzhiner-Electronics/daq122/issues)反馈Bug，我们将尽快与您沟通并及时解决Bug。
-

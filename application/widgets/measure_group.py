@@ -61,9 +61,7 @@ class ReceiverThread(QtCore.QThread):
                 while State.is_measuring:
                     for channel in self.selected_channels:
                         success, data = daq.read_data(
-                            read_elements_count=self.read_elements_count,
-                            channel_number=channel - 1,
-                            timeout=5000
+                            read_elements_count=self.read_elements_count, channel_number=channel - 1, timeout=5000
                         )
                         if success:
                             duration = time.time() - start
@@ -124,6 +122,7 @@ class PlotterThread(QtCore.QThread):
     def run(self):
         def function():
             self.plot_data.emit([self.processed_queue.get()])
+
         while State.is_measuring:
             if not self.processed_queue.empty():
                 function()
@@ -216,7 +215,9 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_receiver.stop_signal.connect(self.stop_measure)
         self.thread_receiver.log_signal.connect(lambda x: logger.info(x))
 
-        self.thread_processor = ProcessorThread(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
+        self.thread_processor = ProcessorThread(
+            data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure
+        )
         self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
         self.thread_plotter.plot_data.connect(self.plot_data)
         self.thread_plotter.finished.connect(self.finish_measure)

@@ -34,4 +34,3 @@ class State:
     duration: int = 60
     read_elements_count = ReadElementsCountModel()
     is_average: bool = True
-
