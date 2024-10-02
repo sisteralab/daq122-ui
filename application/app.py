@@ -45,7 +45,7 @@ class MainWidget(QtWidgets.QWidget):
 
         # logging config
         logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.INFO)
 
         log_widget_handler = LogHandler(self.log_widget)
         stream_handler = logging.StreamHandler()
