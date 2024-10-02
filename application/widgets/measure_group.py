@@ -75,16 +75,24 @@ class ProcessorThread(QtCore.QThread):
         self.measure = measure
 
     def run(self):
-        while State.is_measuring or State.is_waiting:
+        def function():
+            data = self.data_queue.get()
+            mean_voltage = np.mean(data["voltage"])
+            self.processed_queue.put({"channel": data["channel"], "voltage": mean_voltage, "time": data["time"]})
+            if self.is_average:
+                self.measure.data["data"][data["channel"]]["voltage"].append(mean_voltage)
+            else:
+                self.measure.data["data"][data["channel"]]["voltage"].append(data["voltage"])
+            self.measure.data["data"][data["channel"]]["time"].append(data["time"])
+
+        while State.is_measuring:
             if not self.data_queue.empty():
-                data = self.data_queue.get()
-                mean_voltage = np.mean(data["voltage"])
-                self.processed_queue.put({"channel": data["channel"], "voltage": mean_voltage, "time": data["time"]})
-                if self.is_average:
-                    self.measure.data["data"][data["channel"]]["voltage"].append(mean_voltage)
-                else:
-                    self.measure.data["data"][data["channel"]]["voltage"].append(data["voltage"])
-                self.measure.data["data"][data["channel"]]["time"].append(data["time"])
+                function()
+
+        time.sleep(1)
+        while not self.data_queue.empty():
+            function()
+            time.sleep(0.1)
 
         self.finished.emit()
 
@@ -98,9 +106,16 @@ class PlotterThread(QtCore.QThread):
         self.data = []
 
     def run(self):
-        while State.is_measuring or State.is_waiting:
+        def function():
+            self.plot_data.emit([self.processed_queue.get()])
+        while State.is_measuring:
             if not self.processed_queue.empty():
-                self.plot_data.emit([self.processed_queue.get()])
+                function()
+
+        time.sleep(0.5)
+        while not self.processed_queue.empty():
+            function()
+            time.sleep(0.2)
 
         self.finished.emit()
 
@@ -198,7 +213,6 @@ class MeasureGroup(QtWidgets.QGroupBox):
 
     @staticmethod
     def stop_measure():
-        State.is_waiting = True
         State.is_measuring = False
         logger.info("Wait to finish measuring...")
 
@@ -208,7 +222,6 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_plotter = None
         self.measure.save(finish=True)
         self.measure = None
-        State.is_waiting = False
         State.is_measuring = False
         logger.info("Measure finished!")
 
