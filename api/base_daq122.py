@@ -66,7 +66,6 @@ class DAQ122:
             self.dll.DAQ122_Delete(self.obj)
             self.obj = None
             logger.info("Device deleted")
-        logger.warning("Unable delete device; self.obj is None")
 
     def initialize_device(self) -> bool:
         if not self.dll.DAQ122_InitializeDevice(self.obj):
