@@ -105,8 +105,6 @@ class ProcessorProcess(Process):
             function()
             time.sleep(0.1)
 
-        self.processed_queue.put("Processor finished.")
-
 
 class PlotterThread(QtCore.QThread):
     plot_data = pyqtSignal(list)
@@ -135,7 +133,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
     def __init__(self, parent):
         super().__init__(parent)
         self.process_receiver = None
-        self.precess_processor = None
+        self.process_processor = None
         self.thread_plotter = None
         self.data_queue = None
         self.processed_queue = None
@@ -212,8 +210,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.process_receiver = ReceiverProcess(duration=int(self.duration.value()), data_queue=self.data_queue, log_queue=self.log_queue)
         self.process_receiver.start()
 
-        self.precess_processor = ProcessorProcess(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
-        self.precess_processor.start()
+        self.process_processor = ProcessorProcess(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
+        self.process_processor.start()
 
         self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
         self.thread_plotter.plot_data.connect(self.plot_data)
@@ -243,7 +241,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
     def finish_measure(self):
         self.measure.save(finish=True)
         self.process_receiver = None
-        self.precess_processor = None
+        self.process_processor = None
         self.thread_plotter = None
         State.is_measuring = False
         logger.info("Measure finished!")
