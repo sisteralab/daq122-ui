@@ -100,7 +100,7 @@ def main():
                     time.sleep(args.epr / sample_rate)
                     channel_data = []
                     for channel_index, channel in enumerate(args.channel):
-                        success, data = daq.read_data(read_elements_count=args.epr, channel_number=channel,
+                        success, data = daq.read_data(read_elements_count=args.epr, channel_number=channel-1,
                                                       timeout=5000)
                         if success:
                             duration = time.time() - start
