@@ -54,63 +54,63 @@ class DAQ122:
             try:
                 self.obj = self.dll.DAQ122_New()
             except (OSError, WindowsError):
-                logger.error("Failed to create DAQ122 object")
+                logger.debug("Failed to create DAQ122 object")
                 raise DeviceCreateError("Failed to create DAQ122 object")
         if not self.obj:
-            logger.error("Failed to create DAQ122 object")
+            logger.debug("Failed to create DAQ122 object")
             raise DeviceCreateError("Failed to create DAQ122 object")
-        logger.info("Device created")
+        logger.debug("Device created")
 
     def delete_device(self):
         if self.obj:
             self.dll.DAQ122_Delete(self.obj)
             self.obj = None
-            logger.info("Device deleted")
+            logger.debug("Device deleted")
 
     def initialize_device(self) -> bool:
         if not self.dll.DAQ122_InitializeDevice(self.obj):
-            logger.error("Failed to initialize the DAQ device.")
+            logger.debug("Failed to initialize the DAQ device.")
             raise DeviceInitializeError("Failed to initialize the DAQ device.")
-        logger.info("Device initialized")
+        logger.debug("Device initialized")
         return True
 
     def is_connected(self) -> bool:
         if not self.dll.DAQ122_ConnectedDevice(self.obj):
-            logger.error("Device connection failed.")
+            logger.debug("Device connection failed.")
             raise DeviceRunTimeError("Device connection failed.")
-        logger.info("Device state: connected")
+        logger.debug("Device state: connected")
         return True
 
     def configure_sampling_parameters(self, voltage: DAQVoltage, sample_rate: DAQSampleRate) -> bool:
         self.sample_rate = sample_rate
         if not self.dll.DAQ122_ConfigureSamplingParameters(self.obj, voltage.value, sample_rate.value):
-            logger.error("Failed to configure sampling parameters.")
+            logger.debug("Failed to configure sampling parameters.")
             raise DeviceRunTimeError("Failed to configure sampling parameters.")
-        logger.info("Sampling parameters configured")
+        logger.debug("Sampling parameters configured")
         return True
 
     def config_adc_channel(self, channel: DAQADCChannel) -> bool:
         if not self.dll.DAQ122_ConfigADCChannel(self.obj, channel.value):
-            logger.error("Failed to configure ADC channel.")
+            logger.debug("Failed to configure ADC channel.")
             raise DeviceRunTimeError("Failed to configure ADC channel.")
-        logger.info("ADC channels configured")
+        logger.debug("ADC channels configured")
         return True
 
     def start_collection(self):
         if not self.dll.DAQ122_StartCollection(self.obj):
-            logger.error("Failed to start data collection.")
+            logger.debug("Failed to start data collection.")
             raise DeviceRunTimeError("Failed to start data collection.")
-        logger.info("Start collection")
+        logger.debug("Start collection")
 
     def stop_collection(self):
         if not self.dll.DAQ122_StopCollection(self.obj):
-            logger.error("Failed to stop data collection.")
+            logger.debug("Failed to stop data collection.")
             raise DeviceRunTimeError("Failed to stop data collection.")
-        logger.info("Stop collection")
+        logger.debug("Stop collection")
 
     def read_data(self, read_elements_count: int = 100, channel_number: int = 0, timeout: int = 1000):
         if read_elements_count > self.sample_rate.value:
-            logger.error("read_elements_count must not be greater than sample_rate")
+            logger.debug("read_elements_count must not be greater than sample_rate")
             raise DeviceReadElementsCountError("read_elements_count must not be greater than sample_rate")
         data_buffer = (ctypes.c_double * self.sample_rate.value)()
         label = self.dll.DAQ122_TryReadData(self.obj, channel_number, data_buffer, read_elements_count, timeout)
