@@ -175,7 +175,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
             data={
                 "sample_rate": State.sample_rate.value,
                 "voltage": State.voltage.Voltage5V.name,
-                "elements_per_request": State.read_elements_count,
+                "elements_per_request": int(State.read_elements_count.value),
                 "data": data,
             }
         )
@@ -193,6 +193,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.btn_start.setEnabled(False)
         State.is_measuring = True
         self.thread_receiver.start()
+        self.thread_processor.start()
+        self.thread_plotter.start()
 
     @staticmethod
     def stop_measure():
