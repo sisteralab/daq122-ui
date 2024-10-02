@@ -10,7 +10,7 @@ class MonitorGroup(QtWidgets.QGroupBox):
 
         vlayout = QtWidgets.QVBoxLayout()
         glayout = QtWidgets.QGridLayout()
-        hlayout = QtWidgets.QHBoxLayout()
+        flayout = QtWidgets.QFormLayout()
 
         for i in range(8):
             glayout.addWidget(QtWidgets.QLabel(f"AI{i+1}", self), 0, i)
@@ -19,17 +19,17 @@ class MonitorGroup(QtWidgets.QGroupBox):
             glayout.addWidget(ai, 1, i)
 
         self.timer = QtWidgets.QLabel("", self)
-        hlayout.addWidget(QtWidgets.QLabel("Timer:"), alignment=QtCore.Qt.AlignmentFlag.AlignLeft)
-        hlayout.addWidget(self.timer, alignment=QtCore.Qt.AlignmentFlag.AlignLeft)
+        flayout.addRow("Timer:", self.timer)
+        flayout.setFormAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
         vlayout.addLayout(glayout)
-        vlayout.addLayout(hlayout)
+        vlayout.addLayout(flayout)
 
         self.setLayout(vlayout)
 
     def add_data(self, data: List[Dict]):
         for dat in data:
             ai = getattr(self, f"ai{dat['channel']}")
-            ai.setText(f"{dat['voltage']:.4f}")
+            ai.setText(f"{dat['voltage']:.5f}")
 
         self.timer.setText(f"{data[0]['time']}")

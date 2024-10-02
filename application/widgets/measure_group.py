@@ -133,10 +133,10 @@ class MeasureGroup(QtWidgets.QGroupBox):
         flayout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.setFormAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.addRow("Measuring Time, s:", self.duration)
-        flayout.addRow(self.is_plot_data)
-        flayout.addRow(self.plot_window_label, self.plot_window)
         flayout.addRow("Elements per Request:", self.read_elements)
         flayout.addRow(self.is_average)
+        flayout.addRow(self.is_plot_data)
+        flayout.addRow(self.plot_window_label, self.plot_window)
 
         self.btn_start = QtWidgets.QPushButton("Start", self)
         self.btn_start.clicked.connect(self.start_measure)
