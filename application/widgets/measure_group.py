@@ -4,7 +4,6 @@ from multiprocessing import Queue
 
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSignal
 
 from api import get_daq_class
 from api.structures import DAQADCChannel
@@ -16,8 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiverThread(QtCore.QThread):
-    data_plot = pyqtSignal(list)
-
     def __init__(self, parent, duration: int, data_queue):
         super().__init__(parent)
         self.duration = duration
