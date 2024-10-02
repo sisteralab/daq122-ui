@@ -59,6 +59,7 @@ class MeasureThread(QtCore.QThread):
             start = time.time()
             while State.is_measuring:
                 data_plot = []
+                time.sleep(self.read_elements_count / self.sample_rate.value)
                 for channel in self.selected_channels:
                     success, data = daq.read_data(
                         read_elements_count=self.read_elements_count,
@@ -67,21 +68,18 @@ class MeasureThread(QtCore.QThread):
                     )
                     if success:
                         duration = time.time() - start
-                        read_data = np.array(data)
-                        mean = np.mean(read_data)
+                        mean = np.mean(data)
                         if self.is_average:
                             self.measure.data["data"][channel].append(mean)
                         else:
-                            self.measure.data["data"][channel].extend(read_data)
-                        data_plot.append({"channel": channel, "voltage": mean, "time": duration})
+                            self.measure.data["data"][channel].extend(list(data))
 
-                        del data, read_data
+                        data_plot.append({"channel": channel, "voltage": mean, "time": duration})
 
                         if duration > self.duration:
                             State.is_measuring = False
-                if not data_plot:
-                    continue
-                self.data_plot.emit(data_plot)
+                if data_plot:
+                    self.data_plot.emit(data_plot)
 
         self.finish()
 
@@ -105,10 +103,20 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.duration.setValue(State.duration)
         self.duration.valueChanged.connect(self.set_duration)
 
+        self.is_plot_data = QtWidgets.QCheckBox(self)
+        self.is_plot_data.setText("Plot data")
+        self.is_plot_data.setToolTip("Plotting might take a lot CPU resources!")
+        self.is_plot_data.setChecked(State.is_plot_data)
+        self.is_plot_data.stateChanged.connect(self.set_is_plot_data)
+
+        self.plot_window_label = QtWidgets.QLabel("Plot points count:", self)
+        self.plot_window_label.setHidden(not State.is_plot_data)
+
         self.plot_window = QtWidgets.QSpinBox(self)
         self.plot_window.setRange(1, 60)
         self.plot_window.setValue(State.plot_window)
         self.plot_window.valueChanged.connect(self.set_plot_window)
+        self.plot_window.setHidden(not State.is_plot_data)
 
         self.read_elements = QtWidgets.QSpinBox(self)
         self.read_elements.setRange(1, 1000)
@@ -125,7 +133,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
         flayout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.setFormAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.addRow("Measuring Time, s:", self.duration)
-        flayout.addRow("Plot points count:", self.plot_window)
+        flayout.addRow(self.is_plot_data)
+        flayout.addRow(self.plot_window_label, self.plot_window)
         flayout.addRow("Elements per Request:", self.read_elements)
         flayout.addRow(self.is_average)
 
@@ -146,10 +155,11 @@ class MeasureGroup(QtWidgets.QGroupBox):
             return
         self.parent().plot_widget.clear()
         self.thread_measure = MeasureThread(self, int(self.duration.value()))
-        self.thread_measure.data_plot.connect(self.plot_data)
+        if self.is_plot_data.isChecked():
+            self.thread_measure.data_plot.connect(self.plot_data)
         self.thread_measure.log.connect(lambda x: logger.info(x))
         self.btn_start.setEnabled(False)
-        self.thread_measure.finished.connect(lambda: self.btn_start.setEnabled(True))
+        self.thread_measure.finished.connect(self.finish_measure)
         State.is_measuring = True
         self.thread_measure.start()
 
@@ -157,12 +167,27 @@ class MeasureGroup(QtWidgets.QGroupBox):
     def stop_measure():
         State.is_measuring = False
 
+    def finish_measure(self):
+        self.btn_start.setEnabled(True)
+
     def plot_data(self, data: list):
-        self.parent().plot_widget.add_plots(data)
+        if self.is_plot_data.isChecked():
+            self.parent().plot_widget.add_plots(data)
+        self.parent().monitor_widget.add_data(data)
 
     @staticmethod
     def set_duration(value):
         State.duration = int(value)
+
+    def set_is_plot_data(self, state):
+        if state == QtCore.Qt.CheckState.Checked:
+            self.plot_window.setHidden(False)
+            self.plot_window_label.setHidden(False)
+            State.is_plot_data = True
+            return
+        self.plot_window.setHidden(True)
+        self.plot_window_label.setHidden(True)
+        State.is_plot_data = False
 
     @staticmethod
     def set_plot_window(value):

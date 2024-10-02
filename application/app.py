@@ -10,6 +10,7 @@ from application.widgets.config_group import ConfigGroup
 from application.widgets.initialize_group import InitializeGroup
 from application.widgets.log import LogWidget, LogHandler, StdoutRedirector
 from application.widgets.measure_group import MeasureGroup
+from application.widgets.monitor import MonitorGroup
 
 
 class MainWidget(QtWidgets.QWidget):
@@ -19,6 +20,9 @@ class MainWidget(QtWidgets.QWidget):
         hlayout = QtWidgets.QHBoxLayout()
         left_vlayout = QtWidgets.QVBoxLayout()
         right_vlayout = QtWidgets.QVBoxLayout()
+
+        self.monitor_widget = MonitorGroup(self)
+        left_vlayout.addWidget(self.monitor_widget)
 
         self.plot_widget = PlotWidget(self)
         left_vlayout.addWidget(self.plot_widget)
