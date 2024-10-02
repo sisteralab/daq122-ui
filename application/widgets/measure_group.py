@@ -58,7 +58,6 @@ class ReceiverThread(QtCore.QThread):
                         self.data_queue.put({"channel": channel, "voltage": list(data), "time": duration})
                         if duration > self.duration:
                             State.is_measuring = False
-            daq.stop_collection()
 
         self.finish()
 
