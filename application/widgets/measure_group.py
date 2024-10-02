@@ -1,6 +1,6 @@
 import logging
 import time
-from multiprocessing import Queue
+from multiprocessing import Queue, Process
 from typing import Dict, List
 
 import numpy as np
@@ -13,18 +13,15 @@ from api.structures import DAQADCChannel
 from store.data import MeasureManager
 from store.state import State
 
-
 logger = logging.getLogger(__name__)
 
 
-class ReceiverThread(QtCore.QThread):
-    stop_signal = pyqtSignal()
-    log_signal = pyqtSignal(str)
-
-    def __init__(self, duration: int, data_queue):
+class ReceiverProcess(Process):
+    def __init__(self, duration: int, data_queue, log_queue):
         super().__init__()
         self.duration = duration
         self.data_queue = data_queue
+        self.log_queue = log_queue
         self.read_elements_count = int(State.read_elements_count.value)
         self.sample_rate = State.sample_rate
         self.voltage = State.voltage
@@ -34,27 +31,27 @@ class ReceiverThread(QtCore.QThread):
         DAQ122 = get_daq_class()
         try:
             with DAQ122() as daq:
-                self.log_signal.emit("Device initialized and created!")
+                self.log_queue.put("Device initialized and created!")
                 if not daq.is_connected():
                     self.finish()
                     return
 
-                self.log_signal.emit("Device state is connected!")
+                self.log_queue.put("Device state is connected!")
 
                 if not daq.configure_sampling_parameters(self.voltage, self.sample_rate):
                     self.finish()
                     return
 
-                self.log_signal.emit("Device sampling parameters configured!")
+                self.log_queue.put("Device sampling parameters configured!")
 
                 if not daq.config_adc_channel(DAQADCChannel.AIN_ALL):
                     self.finish()
                     return
 
-                self.log_signal.emit("Device ADC channel configured!")
+                self.log_queue.put("Device ADC channel configured!")
 
                 daq.start_collection()
-                self.log_signal.emit("Device started collection!")
+                self.log_queue.put("Device started collection!")
                 time.sleep(1)  # Wait for data to accumulate
 
                 start = time.time()
@@ -69,20 +66,18 @@ class ReceiverThread(QtCore.QThread):
                             duration = time.time() - start
                             self.data_queue.put({"channel": channel, "voltage": list(data), "time": duration})
                             if duration > self.duration:
-                                self.stop_signal.emit()
+                                self.finish()
 
-            self.log_signal.emit("Device disconnected!")
+            self.log_queue.put("Device disconnected!")
         except DeviceError as e:
-            self.log_signal.emit(f"!ERROR! {str(e)}")
-            self.stop_signal.emit()
-
-        self.finish()
+            self.log_queue.put(f"!ERROR! {str(e)}")
+            self.finish()
 
     def finish(self):
-        self.finished.emit()
+        self.log_queue.put("Receiver finished.")
 
 
-class ProcessorThread(QtCore.QThread):
+class ProcessorProcess(Process):
     def __init__(self, data_queue, processed_queue, measure):
         super().__init__()
         self.data_queue = data_queue
@@ -110,7 +105,7 @@ class ProcessorThread(QtCore.QThread):
             function()
             time.sleep(0.1)
 
-        self.finished.emit()
+        self.processed_queue.put("Processor finished.")
 
 
 class PlotterThread(QtCore.QThread):
@@ -139,11 +134,12 @@ class PlotterThread(QtCore.QThread):
 class MeasureGroup(QtWidgets.QGroupBox):
     def __init__(self, parent):
         super().__init__(parent)
-        self.thread_receiver = None
-        self.thread_processor = None
+        self.process_receiver = None
+        self.precess_processor = None
         self.thread_plotter = None
         self.data_queue = None
         self.processed_queue = None
+        self.log_queue = None
         self.measure = None
 
         self.setTitle("Measure")
@@ -200,6 +196,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
 
         self.data_queue = Queue()
         self.processed_queue = Queue()
+        self.log_queue = Queue()
 
         data = {channel: {"voltage": [], "time": []} for channel in State.selected_channels}
         self.measure = MeasureManager.create(
@@ -212,11 +209,12 @@ class MeasureGroup(QtWidgets.QGroupBox):
         )
         self.measure.save(finish=False)
 
-        self.thread_receiver = ReceiverThread(duration=int(self.duration.value()), data_queue=self.data_queue)
-        self.thread_receiver.stop_signal.connect(self.stop_measure)
-        self.thread_receiver.log_signal.connect(lambda x: logger.info(x))
+        self.process_receiver = ReceiverProcess(duration=int(self.duration.value()), data_queue=self.data_queue, log_queue=self.log_queue)
+        self.process_receiver.start()
 
-        self.thread_processor = ProcessorThread(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
+        self.precess_processor = ProcessorProcess(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
+        self.precess_processor.start()
+
         self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
         self.thread_plotter.plot_data.connect(self.plot_data)
         self.thread_plotter.finished.connect(self.finish_measure)
@@ -224,9 +222,18 @@ class MeasureGroup(QtWidgets.QGroupBox):
 
         self.btn_start.setEnabled(False)
         State.is_measuring = True
-        self.thread_receiver.start()
-        self.thread_processor.start()
         self.thread_plotter.start()
+
+        self.log_timer = QtCore.QTimer(self)
+        self.log_timer.timeout.connect(self.check_log_queue)
+        self.log_timer.start(100)
+
+    def check_log_queue(self):
+        while not self.log_queue.empty():
+            message = self.log_queue.get()
+            logger.info(message)
+            if message == "Receiver finished.":
+                self.stop_measure()
 
     @staticmethod
     def stop_measure():
@@ -235,8 +242,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
 
     def finish_measure(self):
         self.measure.save(finish=True)
-        self.thread_receiver = None
-        self.thread_processor = None
+        self.process_receiver = None
+        self.precess_processor = None
         self.thread_plotter = None
         State.is_measuring = False
         logger.info("Measure finished!")
