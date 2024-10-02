@@ -46,14 +46,14 @@ class DAQ122:
             self.stop_collection()
             self.delete_device()
             del self
-        except (OSError, WindowsError) as e:
+        except (OSError,) as e:
             raise DeviceCloseError(str(e))
 
     def create_device(self):
         if self.obj is None:
             try:
                 self.obj = self.dll.DAQ122_New()
-            except (OSError, WindowsError):
+            except (OSError,):
                 logger.error("Failed to create DAQ122 object")
                 raise DeviceCreateError("Failed to create DAQ122 object")
         if not self.obj:
