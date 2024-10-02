@@ -79,12 +79,12 @@ class ProcessorThread(QtCore.QThread):
             if not self.data_queue.empty():
                 data = self.data_queue.get()
                 mean_voltage = np.mean(data["voltage"])
-                self.processed_queue.put({"channel": data["channel"], "voltage": mean_voltage})
+                self.processed_queue.put({"channel": data["channel"], "voltage": mean_voltage, "time": data["time"]})
                 if self.is_average:
-                    self.measure.data["channel"]["voltage"].append(mean_voltage)
+                    self.measure.data["data"][data["channel"]]["voltage"].append(mean_voltage)
                 else:
-                    self.measure.data["channel"]["voltage"].append(data["voltage"])
-                self.measure.data["channel"]["time"].append(data["time"])
+                    self.measure.data["data"][data["channel"]]["voltage"].append(data["voltage"])
+                self.measure.data["data"][data["channel"]]["time"].append(data["time"])
 
         self.finished.emit()
 
