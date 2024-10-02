@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 from typing import Union, Dict, Any
 
@@ -88,13 +89,9 @@ class MeasureManager:
             finished = datetime.now()
         caption = f"Saving measure {measure.id}"
         try:
-            # Получаем комментарий и используем его в качестве начального имени файла
-            comment = str(measure.comment)
-            comment.replace(" ", "_")
-            comment.replace("\n", "_")
-            comment.replace("\\", "_")
-            comment.replace("/", "_")
-            default_filename = f"{comment[:50]}.h5"
+            default_filename = f"{measure.comment}.h5"
+            default_filename = re.sub(r'[^\w\s-]', '', default_filename).strip()
+            default_filename = re.sub(r'[-\s]+', '-', default_filename)
             filepath, _ = QFileDialog.getSaveFileName(filter="*.h5", caption=caption, directory=default_filename)
             if not filepath:
                 return
