@@ -17,12 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiverProcess(Process):
-    def __init__(self, duration: int, data_queue, log_queue, state):
+    def __init__(self, duration: int, data_queue, log_queue, is_measuring):
         super().__init__()
         self.duration = duration
         self.data_queue = data_queue
         self.log_queue = log_queue
-        self.state = state
+        self.is_measuring = is_measuring
         self.read_elements_count = int(State.read_elements_count.value)
         self.sample_rate = State.sample_rate
         self.voltage = State.voltage
@@ -56,7 +56,7 @@ class ReceiverProcess(Process):
                 time.sleep(1)  # Wait for data to accumulate
 
                 start = time.time()
-                while self.state["is_measuring"]:
+                while self.is_measuring.value:
                     for channel in self.selected_channels:
                         success, data = daq.read_data(
                             read_elements_count=self.read_elements_count, channel_number=channel - 1, timeout=5000
@@ -74,17 +74,17 @@ class ReceiverProcess(Process):
 
     def finish(self):
         self.log_queue.put("Receiver finished.")
-        self.state["is_measuring"] = False
+        self.is_measuring.value = False
 
 
 class ProcessorProcess(Process):
-    def __init__(self, data_queue, processed_queue, measure, state):
+    def __init__(self, data_queue, processed_queue, measure, is_measuring):
         super().__init__()
         self.data_queue = data_queue
         self.processed_queue = processed_queue
         self.is_average = State.is_average
         self.measure = measure
-        self.state = state
+        self.is_measuring = is_measuring
 
     def run(self):
         def function():
@@ -97,7 +97,7 @@ class ProcessorProcess(Process):
                 self.measure.data["data"][data["channel"]]["voltage"].append(data["voltage"])
             self.measure.data["data"][data["channel"]]["time"].append(data["time"])
 
-        while self.state["is_measuring"]:
+        while self.is_measuring.value:
             if not self.data_queue.empty():
                 function()
 
@@ -140,10 +140,10 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.data_queue = None
         self.processed_queue = None
         self.log_queue = None
+        self.log_timer = None
         self.measure = None
         self.manager = Manager()
-        self.state = self.manager.dict()
-        self.state["is_measuring"] = False
+        self.is_measuring = self.manager.Value(bool, False)
 
         self.setTitle("Measure")
 
@@ -213,12 +213,18 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.measure.save(finish=False)
 
         self.process_receiver = ReceiverProcess(
-            duration=int(self.duration.value()), data_queue=self.data_queue, log_queue=self.log_queue, state=self.state
+            duration=int(self.duration.value()),
+            data_queue=self.data_queue,
+            log_queue=self.log_queue,
+            state=self.is_measuring,
         )
         self.process_receiver.start()
 
         self.process_processor = ProcessorProcess(
-            data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure, state=self.state
+            data_queue=self.data_queue,
+            processed_queue=self.processed_queue,
+            measure=self.measure,
+            state=self.is_measuring,
         )
         self.process_processor.start()
 
@@ -228,7 +234,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_plotter.finished.connect(lambda: self.btn_start.setEnabled(True))
 
         self.btn_start.setEnabled(False)
-        self.state["is_measuring"] = True
+        self.is_measuring.value = True
         self.thread_plotter.start()
 
         self.log_timer = QtCore.QTimer(self)
@@ -244,8 +250,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
 
     def stop_measure(self):
         State.is_measuring = False
-        if self.state:
-            self.state["is_measuring"] = False
+        self.is_measuring.value = False
         logger.info("Wait to finish measuring...")
 
     def finish_measure(self):
@@ -253,7 +258,6 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.process_receiver = None
         self.process_processor = None
         self.thread_plotter = None
-        State.is_measuring = False
         logger.info("Measure finished!")
 
     def plot_data(self, data: List[Dict]):
