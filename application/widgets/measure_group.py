@@ -226,8 +226,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         logger.info("Measure finished!")
 
     def plot_data(self, data: List[Dict]):
-        # self.parent().plot_widget.add_plots(data)
-        print({"channel": data[0]['channel'], 'voltage': data[0]['voltage'][0], 'time': data[0]['time']})
+        self.parent().plot_widget.add_plots(data)
 
     @staticmethod
     def set_duration(value):
