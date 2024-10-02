@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 class ReceiverThread(QtCore.QThread):
-    def __init__(self, parent, duration: int, data_queue):
-        super().__init__(parent)
+    def __init__(self, duration: int, data_queue):
+        super().__init__()
         self.duration = duration
         self.data_queue = data_queue
-        self.read_elements_count = State.read_elements_count.value
+        self.read_elements_count = int(State.read_elements_count.value)
         self.sample_rate = State.sample_rate
         self.voltage = State.voltage
-        self.selected_channels = sorted(State.selected_channels)
+        self.selected_channels = sorted([_ for _ in State.selected_channels])
 
     def run(self) -> None:
         DAQ122 = get_daq_class()
@@ -65,8 +65,8 @@ class ReceiverThread(QtCore.QThread):
 
 
 class ProcessorThread(QtCore.QThread):
-    def __init__(self, parent, data_queue, processed_queue, measure):
-        super().__init__(parent)
+    def __init__(self, data_queue, processed_queue, measure):
+        super().__init__()
         self.data_queue = data_queue
         self.processed_queue = processed_queue
         self.is_average = State.is_average
@@ -90,8 +90,8 @@ class ProcessorThread(QtCore.QThread):
 class PlotterThread(QtCore.QThread):
     plot_data = pyqtSignal(list)
 
-    def __init__(self, parent, processed_queue):
-        super().__init__(parent)
+    def __init__(self, processed_queue):
+        super().__init__()
         self.processed_queue = processed_queue
         self.data = []
 
@@ -109,7 +109,6 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_receiver = None
         self.thread_processor = None
         self.thread_plotter = None
-        self.thread_remaining_data_processor = None
         self.data_queue = None
         self.processed_queue = None
         self.measure = None
@@ -180,11 +179,11 @@ class MeasureGroup(QtWidgets.QGroupBox):
         )
         self.measure.save(finish=False)
 
-        self.thread_receiver = ReceiverThread(self, duration=int(self.duration.value()), data_queue=self.data_queue)
+        self.thread_receiver = ReceiverThread(duration=int(self.duration.value()), data_queue=self.data_queue)
         self.thread_receiver.finished.connect(lambda: self.btn_start.setEnabled(True))
 
-        self.thread_processor = ProcessorThread(self, data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
-        self.thread_plotter = PlotterThread(self, processed_queue=self.processed_queue)
+        self.thread_processor = ProcessorThread(data_queue=self.data_queue, processed_queue=self.processed_queue, measure=self.measure)
+        self.thread_plotter = PlotterThread(processed_queue=self.processed_queue)
         self.thread_plotter.plot_data.connect(self.plot_data)
         self.thread_plotter.finished.connect(self.finish_measure)
 
@@ -202,7 +201,6 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.thread_receiver = None
         self.thread_processor = None
         self.thread_plotter = None
-        self.thread_remaining_data_processor = None
         self.measure.save(finish=True)
         self.measure = None
         State.is_waiting = False
@@ -210,7 +208,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
         logger.info("Measure finished!")
 
     def plot_data(self, data: List[Dict]):
-        self.parent().plot_widget.add_plots(data)
+        # self.parent().plot_widget.add_plots(data)
+        print({"channel": data[0]['channel'], 'voltage': data[0]['voltage'][0], 'time': data[0]['time']})
 
     @staticmethod
     def set_duration(value):
