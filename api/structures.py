@@ -6,6 +6,13 @@ class EnumMixin:
     def get_by_index(cls, index: int):
         return list(cls)[index]
 
+    @classmethod
+    def get_by_value(cls, value):
+        for name, member in cls.__members__.items():
+            if member.value == value:
+                return member
+        return None
+
 
 class DAQVoltage(EnumMixin, IntEnum):
     Voltage5V = 6
