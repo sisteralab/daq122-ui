@@ -461,11 +461,11 @@
 #ifdef __USE_UNUSED_DEFINITIONS__
 /* Define to necessary symbol if this constant uses a non-standard name on your system. */
 /* XXX: Hello, this isn't even used, nor is it defined anywhere... - Ellzey */
-#define EVENT__PTHREAD_CREATE_JOINABLE 
+#define EVENT__PTHREAD_CREATE_JOINABLE
 #endif
 
 /* The size of `pthread_t', as computed by sizeof. */
-#define EVENT__SIZEOF_PTHREAD_T 
+#define EVENT__SIZEOF_PTHREAD_T
 
 /* The size of a `int', as computed by sizeof. */
 #define EVENT__SIZEOF_INT 4

@@ -27,14 +27,18 @@ class ConfigGroup(QtWidgets.QGroupBox):
         self.sample_rate.addItems([str(it.value) for it in DAQSampleRate])
         self.sample_rate.currentIndexChanged.connect(self.set_sample_rate)
         self.sample_rate.setCurrentText(str(DAQSampleRate.SampleRate500.value))
-        grid_layout2.addWidget(QtWidgets.QLabel("Sample Rate, Hz:", self), 0, 0, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
+        grid_layout2.addWidget(
+            QtWidgets.QLabel("Sample Rate, Hz:", self), 0, 0, alignment=QtCore.Qt.AlignmentFlag.AlignRight
+        )
         grid_layout2.addWidget(self.sample_rate, 0, 1)
 
         self.voltage = QtWidgets.QComboBox(self)
         self.voltage.addItems([str(it.name) for it in DAQVoltage])
         self.voltage.currentIndexChanged.connect(self.set_voltage)
         self.voltage.setCurrentText(str(DAQVoltage.Voltage5V.name))
-        grid_layout2.addWidget(QtWidgets.QLabel("Voltage, V:", self), 1, 0, alignment=QtCore.Qt.AlignmentFlag.AlignRight)
+        grid_layout2.addWidget(
+            QtWidgets.QLabel("Voltage, V:", self), 1, 0, alignment=QtCore.Qt.AlignmentFlag.AlignRight
+        )
         grid_layout2.addWidget(self.voltage, 1, 1)
 
         hlayout.addLayout(grid_layout)
@@ -51,4 +55,3 @@ class ConfigGroup(QtWidgets.QGroupBox):
     @staticmethod
     def set_voltage(index):
         State.voltage = DAQVoltage.get_by_index(index)
-

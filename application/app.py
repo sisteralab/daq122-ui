@@ -49,7 +49,7 @@ class MainWidget(QtWidgets.QWidget):
 
         log_widget_handler = LogHandler(self.log_widget)
         stream_handler = logging.StreamHandler()
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         log_widget_handler.setFormatter(formatter)
         stream_handler.setFormatter(formatter)
 

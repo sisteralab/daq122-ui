@@ -1,8 +1,13 @@
 import ctypes
 import logging
 
-from api.exceptions import DeviceInitializeError, DeviceCloseError, DeviceCreateError, DeviceRunTimeError, \
-    DeviceReadElementsCountError
+from api.exceptions import (
+    DeviceInitializeError,
+    DeviceCloseError,
+    DeviceCreateError,
+    DeviceRunTimeError,
+    DeviceReadElementsCountError,
+)
 from api.structures import DAQVoltage, DAQSampleRate, DAQADCChannel
 
 logger = logging.getLogger(__name__)

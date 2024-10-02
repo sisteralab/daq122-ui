@@ -8,6 +8,7 @@ class WinDAQ122(DAQ122):
     """
     A class to interface with the DAQ122 data acquisition system in Windows.
     """
+
     def _define_dll(self):
         return os.path.join(os.getcwd(), r"libdaq-2.0.0.dll")
 
@@ -25,7 +26,7 @@ class WinDAQ122(DAQ122):
         self.dll.DAQ122_ConfigureSamplingParameters.argtypes = [
             ctypes.POINTER(ctypes.c_uint32),
             ctypes.c_uint64,
-            ctypes.c_uint64
+            ctypes.c_uint64,
         ]
         self.dll.DAQ122_ConfigureSamplingParameters.restype = ctypes.c_bool
 
@@ -43,6 +44,6 @@ class WinDAQ122(DAQ122):
             ctypes.c_uint32,  # channel
             ctypes.POINTER(ctypes.c_double),  # data
             ctypes.c_uint32,  # read size
-            ctypes.c_uint32  # timeout
+            ctypes.c_uint32,  # timeout
         ]
         self.dll.DAQ122_TryReadData.restype = ctypes.c_bool
