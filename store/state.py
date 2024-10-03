@@ -36,4 +36,3 @@ class State:
     is_average: bool = True
     is_plot_data: bool = False
     store_data: bool = True
-

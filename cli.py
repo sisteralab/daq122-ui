@@ -11,17 +11,17 @@ import curses
 
 
 def save_to_hdf5(filename, data, channels, sample_rate, voltage, duration, averaging, epr):
-    with h5py.File(filename, 'w') as file:
-        data_group = file.create_group('data')
+    with h5py.File(filename, "w") as file:
+        data_group = file.create_group("data")
         for i, channel in enumerate(channels):
-            data_group.create_dataset(f'channel_{channel}', data=data[i])
+            data_group.create_dataset(f"channel_{channel}", data=data[i])
 
-        params_group = file.create_group('parameters')
-        params_group.attrs['sample_rate'] = sample_rate
-        params_group.attrs['voltage'] = voltage
-        params_group.attrs['duration'] = duration
-        params_group.attrs['averaging'] = averaging
-        params_group.attrs['epr'] = epr
+        params_group = file.create_group("parameters")
+        params_group.attrs["sample_rate"] = sample_rate
+        params_group.attrs["voltage"] = voltage
+        params_group.attrs["duration"] = duration
+        params_group.attrs["averaging"] = averaging
+        params_group.attrs["epr"] = epr
 
 
 def display_table(queue, channels):
@@ -53,20 +53,23 @@ def display_table(queue, channels):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        prog='DAQ122 CLI',
-        description='Measuring via DAQ122 ADC',
-        epilog='LOL'
+    parser = argparse.ArgumentParser(prog="DAQ122 CLI", description="Measuring via DAQ122 ADC", epilog="LOL")
+    parser.add_argument(
+        "-s",
+        "--sample-rate",
+        action="store",
+        default=DAQSampleRate.SampleRate500.value,
+        choices=[sr.value for sr in DAQSampleRate],
+        type=int,
     )
-    parser.add_argument('-s', '--sample-rate', action='store', default=DAQSampleRate.SampleRate500.value,
-                        choices=[sr.value for sr in DAQSampleRate], type=int)
-    parser.add_argument('-e', '--epr', action='store', default=100, type=int)
-    parser.add_argument('-c', '--channel', action='append', choices=list(range(1, 9)), type=int)
-    parser.add_argument('-v', '--voltage', action='store', default="Voltage5V", choices=[vt.name for vt in DAQVoltage],
-                        type=str)
-    parser.add_argument('-a', '--average', action='store_true')
-    parser.add_argument('-d', '--duration', default=60, type=int)
-    parser.add_argument('-o', '--output', default='data.h5', type=str, help='Output HDF5 file')
+    parser.add_argument("-e", "--epr", action="store", default=100, type=int)
+    parser.add_argument("-c", "--channel", action="append", choices=list(range(1, 9)), type=int)
+    parser.add_argument(
+        "-v", "--voltage", action="store", default="Voltage5V", choices=[vt.name for vt in DAQVoltage], type=str
+    )
+    parser.add_argument("-a", "--average", action="store_true")
+    parser.add_argument("-d", "--duration", default=60, type=int)
+    parser.add_argument("-o", "--output", default="data.h5", type=str, help="Output HDF5 file")
 
     args = parser.parse_args()
 
@@ -100,11 +103,12 @@ def main():
                     time.sleep(args.epr / sample_rate)
                     channel_data = []
                     for channel_index, channel in enumerate(args.channel):
-                        success, data = daq.read_data(read_elements_count=args.epr, channel_number=channel-1,
-                                                      timeout=5000)
+                        success, data = daq.read_data(
+                            read_elements_count=args.epr, channel_number=channel - 1, timeout=5000
+                        )
                         if success:
                             duration = time.time() - start
-                            read_data = data[:args.epr]
+                            read_data = data[: args.epr]
                             average_data = np.mean(read_data)
                             if args.average:
                                 data_to_save[channel_index].append(average_data)
@@ -127,8 +131,16 @@ def main():
         queue.put(None)
         display_process.join()
         data_to_save = [np.array(channel_data) for channel_data in data_to_save]
-        save_to_hdf5(args.output, data_to_save, args.channel, sample_rate.value, voltage.name, args.duration,
-                     args.average, args.epr)
+        save_to_hdf5(
+            args.output,
+            data_to_save,
+            args.channel,
+            sample_rate.value,
+            voltage.name,
+            args.duration,
+            args.average,
+            args.epr,
+        )
         print(f"\nData saved to {args.output}")
 
 

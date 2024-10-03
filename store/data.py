@@ -90,27 +90,27 @@ class MeasureManager:
         caption = f"Saving measure {measure.id}"
         try:
             default_filename = f"{measure.comment}"
-            default_filename = re.sub(r'[^\w\s-]', '', default_filename).strip()
-            default_filename = re.sub(r'[-\s]+', '-', default_filename)
+            default_filename = re.sub(r"[^\w\s-]", "", default_filename).strip()
+            default_filename = re.sub(r"[-\s]+", "-", default_filename)
             filepath, _ = QFileDialog.getSaveFileName(filter="*.h5", caption=caption, directory=default_filename)
             if not filepath:
                 return
             if not filepath.endswith(".h5"):
                 filepath += ".h5"
-            with h5py.File(filepath, 'w') as hdf:
-                hdf.attrs['id'] = measure.id
-                hdf.attrs['comment'] = measure.comment
-                hdf.attrs['started'] = measure.started.strftime("%Y-%m-%d %H:%M:%S")
-                hdf.attrs['finished'] = finished.strftime("%Y-%m-%d %H:%M:%S")
+            with h5py.File(filepath, "w") as hdf:
+                hdf.attrs["id"] = measure.id
+                hdf.attrs["comment"] = measure.comment
+                hdf.attrs["started"] = measure.started.strftime("%Y-%m-%d %H:%M:%S")
+                hdf.attrs["finished"] = finished.strftime("%Y-%m-%d %H:%M:%S")
 
-                data_group = hdf.create_group('data')
-                data_group.attrs['sample_rate'] = measure.data['sample_rate']
-                data_group.attrs['voltage'] = measure.data['voltage']
-                data_group.attrs['epr'] = measure.data['epr']
-                data_group.attrs['is_average'] = measure.data['is_average']
+                data_group = hdf.create_group("data")
+                data_group.attrs["sample_rate"] = measure.data["sample_rate"]
+                data_group.attrs["voltage"] = measure.data["voltage"]
+                data_group.attrs["epr"] = measure.data["epr"]
+                data_group.attrs["is_average"] = measure.data["is_average"]
 
-                for key, value in measure.data['data'].items():
-                    data_group.create_dataset(f'channel_{key}', data=value)
+                for key, value in measure.data["data"].items():
+                    data_group.create_dataset(f"channel_{key}", data=value)
             measure.saved = True
             measure.save(finish=False)
         except (IndexError, FileNotFoundError):
@@ -211,10 +211,7 @@ class MeasureTableModel(QAbstractTableModel):
     def updateData(self):
         self.beginResetModel()
         measures = self.manager.all()
-        self._data = [
-            [m.id, m.comment, m.started, m.finished, m.saved]
-            for m in measures
-        ]
+        self._data = [[m.id, m.comment, m.started, m.finished, m.saved] for m in measures]
         self.endResetModel()
 
     def headerData(self, section, orientation, role):

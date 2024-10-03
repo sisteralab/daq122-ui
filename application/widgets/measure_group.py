@@ -66,13 +66,11 @@ class MeasureThread(QtCore.QThread):
                 time.sleep(self.read_elements_count / self.sample_rate.value)
                 for channel in self.selected_channels:
                     success, data = daq.read_data(
-                        read_elements_count=self.read_elements_count,
-                        channel_number=channel - 1,
-                        timeout=5000
+                        read_elements_count=self.read_elements_count, channel_number=channel - 1, timeout=5000
                     )
                     if success:
                         duration = time.time() - start
-                        measured_data = data[:self.read_elements_count]
+                        measured_data = data[: self.read_elements_count]
                         mean = np.mean(measured_data)
                         if self.store_data:
                             if self.is_average:

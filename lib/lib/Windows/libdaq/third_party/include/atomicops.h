@@ -70,7 +70,7 @@ extern "C" void AnnotateHappensAfter(const char*, int, void*);
 #if defined(AE_VCPP) || defined(AE_ICC)
 #define AE_FORCEINLINE __forceinline
 #elif defined(AE_GCC)
-//#define AE_FORCEINLINE __attribute__((always_inline)) 
+//#define AE_FORCEINLINE __attribute__((always_inline))
 #define AE_FORCEINLINE inline
 #else
 #define AE_FORCEINLINE inline
@@ -268,13 +268,13 @@ public:
 
 	AE_FORCEINLINE operator T() const AE_NO_TSAN { return load(); }
 
-	
+
 #ifndef AE_USE_STD_ATOMIC_FOR_WEAK_ATOMIC
 	template<typename U> AE_FORCEINLINE weak_atomic const& operator=(U&& x) AE_NO_TSAN { value = std::forward<U>(x); return *this; }
 	AE_FORCEINLINE weak_atomic const& operator=(weak_atomic const& other) AE_NO_TSAN { value = other.value; return *this; }
-	
+
 	AE_FORCEINLINE T load() const AE_NO_TSAN { return value; }
-	
+
 	AE_FORCEINLINE T fetch_add_acquire(T increment) AE_NO_TSAN
 	{
 #if defined(AE_ARCH_X64) || defined(AE_ARCH_X86)
@@ -288,7 +288,7 @@ public:
 		assert(false && "T must be either a 32 or 64 bit type");
 		return value;
 	}
-	
+
 	AE_FORCEINLINE T fetch_add_release(T increment) AE_NO_TSAN
 	{
 #if defined(AE_ARCH_X64) || defined(AE_ARCH_X86)
@@ -309,7 +309,7 @@ public:
 		value.store(std::forward<U>(x), std::memory_order_relaxed);
 		return *this;
 	}
-	
+
 	AE_FORCEINLINE weak_atomic const& operator=(weak_atomic const& other) AE_NO_TSAN
 	{
 		value.store(other.value.load(std::memory_order_relaxed), std::memory_order_relaxed);
@@ -317,18 +317,18 @@ public:
 	}
 
 	AE_FORCEINLINE T load() const AE_NO_TSAN { return value.load(std::memory_order_relaxed); }
-	
+
 	AE_FORCEINLINE T fetch_add_acquire(T increment) AE_NO_TSAN
 	{
 		return value.fetch_add(increment, std::memory_order_acquire);
 	}
-	
+
 	AE_FORCEINLINE T fetch_add_release(T increment) AE_NO_TSAN
 	{
 		return value.fetch_add(increment, std::memory_order_release);
 	}
 #endif
-	
+
 
 private:
 #ifndef AE_USE_STD_ATOMIC_FOR_WEAK_ATOMIC
@@ -399,7 +399,7 @@ namespace moodycamel
 		{
 		private:
 		    void* m_hSema;
-		    
+
 		    Semaphore(const Semaphore& other);
 		    Semaphore& operator=(const Semaphore& other);
 
@@ -659,7 +659,7 @@ namespace moodycamel
 		{
 		public:
 			typedef std::make_signed<std::size_t>::type ssize_t;
-			
+
 		private:
 		    weak_atomic<ssize_t> m_count;
 		    Semaphore m_sema;
@@ -743,7 +743,7 @@ namespace moodycamel
 		            m_sema.signal(1);
 		        }
 		    }
-		    
+
 		    std::size_t availableApprox() const AE_NO_TSAN
 		    {
 		    	ssize_t count = m_count.load();
