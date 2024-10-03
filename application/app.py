@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
@@ -8,7 +7,7 @@ from application.widgets import PlotWidget
 from application.widgets.data_table import DataTable
 from application.widgets.config_group import ConfigGroup
 from application.widgets.initialize_group import InitializeGroup
-from application.widgets.log import LogWidget, LogHandler, StdoutRedirector
+from application.widgets.log import LogWidget, LogHandler
 from application.widgets.measure_group import MeasureGroup
 from application.widgets.monitor import MonitorGroup
 
@@ -49,18 +48,18 @@ class MainWidget(QtWidgets.QWidget):
 
         # logging config
         logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.INFO)
 
         log_widget_handler = LogHandler(self.log_widget)
         stream_handler = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s")
         log_widget_handler.setFormatter(formatter)
         stream_handler.setFormatter(formatter)
 
         logger.addHandler(log_widget_handler)
         logger.addHandler(stream_handler)
 
-        sys.stdout = StdoutRedirector(self.log_widget)
+        # sys.stdout = StdoutRedirector(self.log_widget)
 
 
 class App(QtWidgets.QMainWindow):

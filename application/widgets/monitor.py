@@ -32,4 +32,11 @@ class MonitorGroup(QtWidgets.QGroupBox):
             ai = getattr(self, f"ai{dat['channel']}")
             ai.setText(f"{dat['voltage']:.5f}")
 
-        self.timer.setText(f"{data[0]['time']}")
+        self.timer.setText(f"{data[0]['time']:.3f}")
+
+    def reset_values(self):
+        for i in range(1, 9):
+            ai = getattr(self, f"ai{i}")
+            ai.setText("")
+
+        self.timer.setText("")

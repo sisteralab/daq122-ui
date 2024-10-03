@@ -1,7 +1,12 @@
+import logging
+
 from PyQt5 import QtWidgets
 
 from api import get_daq_class
 from api.exceptions import DeviceError
+
+
+logger = logging.getLogger(__name__)
 
 
 class InitializeGroup(QtWidgets.QGroupBox):
@@ -30,3 +35,4 @@ class InitializeGroup(QtWidgets.QGroupBox):
                     self.status.setText("Success Connected!")
         except DeviceError as e:
             self.status.setText(str(e))
+            logger.error(str(e))

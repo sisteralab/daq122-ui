@@ -20,3 +20,7 @@ class DeviceReadElementsCountError(DeviceError):
 
 class DeviceCloseError(DeviceError):
     ...
+
+
+class DllError(DeviceError):
+    ...

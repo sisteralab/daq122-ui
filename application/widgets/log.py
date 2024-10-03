@@ -1,9 +1,7 @@
 import logging
-from datetime import datetime
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QSizePolicy
 
 
 class LogWidget(QtWidgets.QGroupBox):
@@ -14,7 +12,7 @@ class LogWidget(QtWidgets.QGroupBox):
         layout = QtWidgets.QHBoxLayout()
         self.content = QtWidgets.QTextEdit(self)
         self.content.setReadOnly(True)
-        self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.content.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
 
         self.btn_clear = QtWidgets.QPushButton("Clear", self)
         self.btn_clear.clicked.connect(self.clear_log)
