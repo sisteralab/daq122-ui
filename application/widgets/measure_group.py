@@ -20,16 +20,19 @@ class MeasureThread(QtCore.QThread):
 
     def __init__(self, parent, duration: int):
         super().__init__(parent)
+        self.store_data = State.store_data
         self.duration = duration
-        self.measure = MeasureManager.create(
-            data={
-                "sample_rate": State.sample_rate.value,
-                "voltage": State.voltage.Voltage5V.name,
-                "epr": State.read_elements_count.value,
-                "data": {channel: [] for channel in State.selected_channels},
-            }
-        )
-        self.measure.save(finish=False)
+        if self.store_data:
+            self.measure = MeasureManager.create(
+                data={
+                    "sample_rate": State.sample_rate.value,
+                    "voltage": State.voltage.Voltage5V.name,
+                    "epr": State.read_elements_count.value,
+                    "is_average": State.is_average,
+                    "data": {channel: [] for channel in State.selected_channels},
+                }
+            )
+            self.measure.save(finish=False)
         self.read_elements_count = State.read_elements_count.value
         self.sample_rate = State.sample_rate
         self.voltage = State.voltage
@@ -71,10 +74,11 @@ class MeasureThread(QtCore.QThread):
                         duration = time.time() - start
                         measured_data = data[:self.read_elements_count]
                         mean = np.mean(measured_data)
-                        if self.is_average:
-                            self.measure.data["data"][channel].append(mean)
-                        else:
-                            self.measure.data["data"][channel].extend(list(measured_data))
+                        if self.store_data:
+                            if self.is_average:
+                                self.measure.data["data"][channel].append(mean)
+                            else:
+                                self.measure.data["data"][channel].extend(list(measured_data))
 
                         data_plot.append({"channel": channel, "voltage": mean, "time": duration})
 
@@ -86,7 +90,8 @@ class MeasureThread(QtCore.QThread):
         self.finish()
 
     def finish(self):
-        self.measure.save(finish=True)
+        if self.store_data:
+            self.measure.save(finish=True)
         self.finished.emit()
 
 
@@ -132,11 +137,18 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.is_average.setChecked(State.is_average)
         self.is_average.stateChanged.connect(self.set_average)
 
+        self.store_data = QtWidgets.QCheckBox(self)
+        self.store_data.setText("Store Data")
+        self.store_data.setToolTip("Storing data to data table below")
+        self.store_data.setChecked(State.store_data)
+        self.store_data.stateChanged.connect(self.set_store_data)
+
         flayout.setLabelAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.setFormAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         flayout.addRow("Measuring Time, s:", self.duration)
         flayout.addRow("Elements per Request:", self.read_elements)
         flayout.addRow(self.is_average)
+        flayout.addRow(self.store_data)
         flayout.addRow(self.is_plot_data)
         flayout.addRow(self.plot_window_label, self.plot_window)
 
@@ -202,3 +214,8 @@ class MeasureGroup(QtWidgets.QGroupBox):
     def set_average(state):
         value = state == QtCore.Qt.CheckState.Checked
         State.is_average = value
+
+    @staticmethod
+    def set_store_data(state):
+        value = state == QtCore.Qt.CheckState.Checked
+        State.store_data = value
