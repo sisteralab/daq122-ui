@@ -68,12 +68,11 @@ class MeasureThread(QtCore.QThread):
                 self.create_measure()
 
                 daq.start_collection()
-                time.sleep(1)  # Wait for data to accumulate
 
                 start = time.time()
                 while State.is_measuring:
                     data_plot = []
-                    time.sleep(self.read_elements_count / self.sample_rate.value)
+                    time.sleep(self.read_elements_count / self.sample_rate.value / 2)
                     for channel in self.selected_channels:
                         success, data = daq.read_data(
                             read_elements_count=self.read_elements_count, channel_number=channel - 1, timeout=5000

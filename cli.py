@@ -94,13 +94,12 @@ def main():
 
             if daq.config_adc_channel(DAQADCChannel.AIN_ALL):
                 daq.start_collection()
-                time.sleep(1)
 
                 count = 0
                 start = time.time()
 
                 while True:
-                    time.sleep(args.epr / sample_rate)
+                    time.sleep(args.epr / sample_rate / 2)
                     channel_data = []
                     for channel_index, channel in enumerate(args.channel):
                         success, data = daq.read_data(
