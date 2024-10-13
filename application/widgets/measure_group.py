@@ -117,7 +117,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         flayout = QtWidgets.QFormLayout()
 
         self.duration = QtWidgets.QSpinBox(self)
-        self.duration.setRange(1, 3600)
+        self.duration.setRange(1, 10000)
         self.duration.setValue(State.duration)
         self.duration.valueChanged.connect(self.set_duration)
 
@@ -131,7 +131,7 @@ class MeasureGroup(QtWidgets.QGroupBox):
         self.plot_window_label.setHidden(not State.is_plot_data)
 
         self.plot_window = QtWidgets.QSpinBox(self)
-        self.plot_window.setRange(1, 60)
+        self.plot_window.setRange(1, 120)
         self.plot_window.setValue(State.plot_window)
         self.plot_window.valueChanged.connect(self.set_plot_window)
         self.plot_window.setHidden(not State.is_plot_data)
