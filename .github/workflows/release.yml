@@ -36,7 +36,7 @@ jobs:
 
     - name: Run build script
       if: runner.os == 'Windows'
-      run: .\build.bat
+      run: .\build-win.bat
 
     - name: Archive Release Asset
       if: runner.os == 'Windows'
