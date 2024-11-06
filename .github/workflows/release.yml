@@ -1,4 +1,4 @@
-name: Release
+name: Build and Release
 
 on:
   push:
@@ -17,8 +17,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        arch: [arm64]
+        os: [windows-latest]
+        arch: [x86]
 
     steps:
     - name: Checkout code
@@ -35,17 +35,18 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run build script
-      run: ./build.sh
+      if: runner.os == 'Windows'
+      run: .\build.bat
 
     - name: Archive Release Asset
-      run: tar -czvf ./dist/DAQ122_Lin_${{ matrix.arch }}.tar.gz -C ./dist DAQ122
-      shell: bash
+      if: runner.os == 'Windows'
+      run: Compress-Archive -Path ./dist/Daq122 -DestinationPath ./dist/Daq122_${{ runner.os }}_${{ matrix.arch }}.zip
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DAQ122_Lin_${{ matrix.arch }}
-        path: ./dist/DAQ122_Lin_${{ matrix.arch }}.tar.gz
+        name: Daq122_${{ runner.os }}_${{ matrix.arch }}
+        path: ./dist/Daq122_${{ runner.os }}_${{ matrix.arch }}.zip
 
   release:
     needs: build
@@ -58,10 +59,14 @@ jobs:
     - name: Download Artifacts
       uses: actions/download-artifact@v4
       with:
-        name: DAQ122_Lin_arm64
+        name: Daq122_Windows_x86
+
+    - name: List contents
+      run: ls -l .
+      shell: bash
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: DAQ122_Lin_arm64.tar.gz
+        files: Daq122_Windows_x86.zip
